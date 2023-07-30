@@ -39,38 +39,51 @@ const d6_width = 0.5;
 const d6_height = 0.5;
 
 class RoadWarriorItemCard extends Cardistry.Card {
-    constructor(dpi, bgColor, text, img) {
+    constructor(dpi, bgColor, title, body, img) {
         super(card_width, card_height, card_bleed, card_safe, card_extra, bgColor, dpi);
 
         this.img = img;
 
-        this.addElement(new Cardistry.ImageBox(
-            this,
-            this.getDrawableBoundRect().cutBottom(this.getDrawableBoundRect().h / 2),
-            'FFFFFF',
-            this.img,
-            false
-        ));
+        // title
         this.addElement(new Cardistry.TextBox(
             this,
-            text,
+            title,
             'Rokkitt Bold',
             '000000',
             text_size,
             0,
             'left',
             'middle',
-            this.getDrawableBoundRect().cutTop(this.getDrawableBoundRect().h / 2),
+            this.getDrawableBoundRect().cutBottomPct(0.8),
+            this.bgColor));
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.4),
+            'FFFFFF',
+            this.img,
+            false
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            body,
+            'Rokkitt Bold',
+            '000000',
+            text_size * 0.66,
+            0,
+            'left',
+            'middle',
+            this.getDrawableBoundRect().cutTopPct(0.6),
             this.bgColor
         ));
     }
 }
 
+// TODO:  Make dark dice icons white...
 class RoadWarriorDie extends Cardistry.Sheet {
-    constructor(faces) {
+    constructor(bgColor, faces) {
         let cards = [];
         for(const face of faces) {
-            let die = new Cardistry.DieFace(d6_width, d6_height, 0, 0, 0, 'FFD65B', 300, face);
+            let die = new Cardistry.DieFace(d6_width, d6_height, 0, 0, 0, bgColor, 300, face);
             die.draw();
             cards.push(die);
         }
@@ -81,17 +94,84 @@ class RoadWarriorDie extends Cardistry.Sheet {
 
 
 im.ready(() => {
-    let card = new RoadWarriorItemCard(300, 'FFFFFF', "test", im.get('shield'));
+    let card = new RoadWarriorItemCard(
+        300,
+        'FFFFFF',
+        'Test Card',
+        "This is a test card body...",
+        im.get('shield')
+    );
     card.draw();
-    card.exportPNG('test.png');
+    card.exportScaledPNG('test.png', 1, true);
 
-    let purple_d6 = new RoadWarriorDie([
-        [im.get('shield')],
-        [im.get('shield')],
-        [im.get('shield'), im.get('shield'), im.get('shield'), im.get('shield'), im.get('shield')],
-        [im.get('shield'), im.get('shield'), im.get('shield'), im.get('shield')],
-        [im.get('shield'), im.get('shield'), im.get('shield')],
-        [im.get('attack'), im.get('shield')]
+    let yellow_d6 = new RoadWarriorDie('FFD65B', [
+        [],
+        [im.get('attack')],
+        [im.get('attack'), im.get('fire')],
+        [im.get('attack'), im.get('attack')],
+        [im.get('attack')],
+        [im.get('shield')]
     ]);
-    purple_d6.exportPNG('test2.png', 3);
+    yellow_d6.exportPNG('var/d6_yellow.png', 3);
+
+    let blue_d6 = new RoadWarriorDie('00449F', [
+        [],
+        [im.get('shield'), im.get('shield')],
+        [im.get('shield')],
+        [im.get('shield')],
+        [im.get('shield')],
+        [im.get('attack')]
+    ]);
+    blue_d6.exportPNG('var/d6_blue.png', 3);
+
+    let green_d6 = new RoadWarriorDie('71D358', [
+        [],
+        [im.get('shield'), im.get('fire')],
+        [im.get('shield'), im.get('shield')],
+        [im.get('shield'), im.get('shield')],
+        [im.get('attack'), im.get('shield')],
+        [im.get('shield')],
+    ]);
+    green_d6.exportPNG('var/d6_green.png', 3);
+
+    let black_d6 = new RoadWarriorDie('000000', [
+        [],
+        [im.get('shield')],
+        [im.get('shield')],
+        [im.get('shield'), im.get('attack')],
+        [im.get('attack')],
+        [im.get('attack')],
+
+    ]);
+    black_d6.exportPNG('var/d6_black.png', 3);
+
+    let orange_d6 = new RoadWarriorDie('FF824A', [
+        [],
+        [im.get('attack')],
+        [im.get('attack'), im.get('fire'), im.get('attack')],
+        [im.get('attack'), im.get('attack'), im.get('attack')],
+        [im.get('attack'), im.get('fire')],
+        [im.get('shield')]
+    ]);
+    orange_d6.exportPNG('var/d6_orange.png', 3);
+
+    let red_d6 = new RoadWarriorDie('FF001C', [
+        [im.get('attack')],
+        [im.get('attack')],
+        [im.get('attack'), im.get('fire'), im.get('attack')],
+        [im.get('attack'), im.get('attack'), im.get('attack')],
+        [im.get('attack'), im.get('fire'), im.get('shield')],
+        [im.get('shield'), im.get('attack')]
+    ]);
+    red_d6.exportPNG('var/d6_red.png', 3);
+
+    let purple_d6 = new RoadWarriorDie('C462DD', [
+        [],
+        [im.get('fire')],
+        [im.get('attack'), im.get('fire')],
+        [im.get('attack'), im.get('attack'), im.get('fire')],
+        [im.get('attack'), im.get('fire'), im.get('fire')],
+        [im.get('shield')]
+    ]);
+    purple_d6.exportPNG('var/d6_purple.png', 3);
 });
