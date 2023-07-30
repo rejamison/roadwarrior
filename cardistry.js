@@ -1,7 +1,7 @@
 const cvs = require("canvas");
 const fs = require("fs");
 const rnd = require("./randomizer");
-const {createCanvas} = require("canvas");
+const {createCanvas, loadImage} = require("canvas");
 
 class BoundaryRect {
     constructor(x, y, w, h) {
@@ -49,20 +49,48 @@ class BoundaryRect {
         return new BoundaryRect(this.x, this.y + h, this.w, this.h - h);
     }
 
+    cutTopPct(p) {
+        let cut = this.h * p;
+        return new BoundaryRect(this.x, this.y + cut, this.w, this.h - cut);
+    }
+
     cutBottom(h) {
         return new BoundaryRect(this.x, this.y, this.w, this.h - h);
+    }
+
+    cutBottomPct(p) {
+        let cut = this.h * p;
+        return new BoundaryRect(this.x, this.y, this.w, this.h - cut);
     }
 
     cutLeft(w) {
         return new BoundaryRect(this.x + w, this.y, this.w - w, this.h);
     }
 
+    cutLeftPct(p) {
+        let cut = this.w * p;
+        return new BoundaryRect(this.x - cut, this.y, this.w - cut, this.h);
+    }
+
     cutRight(w) {
         return new BoundaryRect(this.x, this.y, this.w - w, this.h);
     }
 
+    cutRightPct(p) {
+        let cut = this.w * p;
+        return new BoundaryRect(this.x, this.y, this.w - cut, this.h);
+    }
+
     cut(l, r, t, b) {
         return new BoundaryRect(this.x + l, this.y + t, this.w - l - r, this.h - t - b);
+    }
+
+    cutPct(lp, lr, lt, lb) {
+        let cutl = this.w * lp;
+        let cutr = this.w * lr;
+        let cutt = this.h * lt;
+        let cutb = this.h * lb;
+        return new BoundaryRect(this.x + cutl, this.y + cutt, this.w - cutl - cutr, this.h - cutt - cutb);
     }
 }
 exports.BoundaryRect = BoundaryRect;
@@ -529,6 +557,39 @@ class GridCard extends Card {
 }
 exports.GridCard = GridCard;
 
+class DieFace extends Card {
+    constructor(width, height, bleed, safe, extra, bgColor, dpi, icons) {
+        super(width, height, bleed, safe, extra, bgColor, dpi);
+
+        this.icons = icons;
+
+        if(this.icons.length == 1) {
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect(), this.bgColor, icons[0], false));
+        } else if(this.icons.length == 2) {
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[1], false));
+        } else if(this.icons.length == 3) {
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.25, 0.25, 0.5, 0), this.bgColor, icons[2], false));
+        } else if(this.icons.length == 4) {
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0.5, 0), this.bgColor, icons[2], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[3], false));
+        } else if(this.icons.length == 5) {
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0, 0.66), this.bgColor, icons[0], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0, 0.66), this.bgColor, icons[1], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0.66, 0), this.bgColor, icons[2], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0.66, 0), this.bgColor, icons[3], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.33, 0.33, 0.33, 0.33), this.bgColor, icons[4], false));
+        } else {
+            // do nothing
+        }
+    }
+}
+exports.DieFace = DieFace;
+
 class Sheet {
     constructor(cards) {
         this.cards = cards;
@@ -675,3 +736,29 @@ class Showcase extends Sheet {
     }
 }
 exports.Showcase = Showcase;
+
+class ImageManager {
+    constructor() {
+        this.images = new Map();
+        this.promises = [];
+    }
+
+    loadImage(key, file) {
+        let that = this;
+        this.promises.push(new Promise(function(resolve, reject) {
+            loadImage(file).then((img) => {
+                that.images.set(key, img);
+                resolve();
+            });
+        }));
+    }
+
+    get(key) {
+        return this.images.get(key);
+    }
+
+    ready(onReady) {
+        Promise.all(this.promises).then(onReady);
+    }
+}
+exports.ImageManager = ImageManager;
