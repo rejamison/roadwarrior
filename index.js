@@ -72,12 +72,12 @@ function rowsToObjects(rows) {
 }
 
 class RoadWarriorItemCard extends Cardistry.Card {
-    constructor(title, body, img) {
+    constructor(title, body, hp) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.title = title;
         this.body = body;
-        this.img = img;
+        this.hp = hp;
 
         // title
         this.addElement(new Cardistry.TextBox(
@@ -91,13 +91,6 @@ class RoadWarriorItemCard extends Cardistry.Card {
             'top',
             this.getDrawableBoundRect().cutBottomPct(0.9),
             this.bgColor));
-        this.addElement(new Cardistry.ImageBox(
-            this,
-            this.getDrawableBoundRect().cutPct(0, 0, 0.10, 0.5),
-            'FFFFFF',
-            this.img,
-            false
-        ));
         this.addElement(new Cardistry.TextBox(
             this,
             this.body,
@@ -107,9 +100,31 @@ class RoadWarriorItemCard extends Cardistry.Card {
             0,
             'left',
             'top',
-            this.getDrawableBoundRect().cutTopPct(0.5),
+            this.getDrawableBoundRect().cutTopPct(0.25),
             this.bgColor
         ));
+        if(this.hp.trim().length != 0) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
+                this.bgColor,
+                im.get('shield'),
+                false
+            ));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                '' + hp,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 0.75,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
+                this.bgColor
+            ));
+        }
+
     }
 }
 
@@ -161,18 +176,8 @@ async function main() {
     await loadSheet();
 
     im.ready(() => {
-        let card = new RoadWarriorItemCard(
-            'Test Card',
-            "This is a test card body...",
-            im.get('shield')
-        );
-        card.draw();
-        card.exportScaledPNG('test.png', 1, true);
-
         // generate dice
         for(let die of Object.values(dice)) {
-            console.log(JSON.stringify(die, null, 2));
-
             let rwd = new RoadWarriorDie(COLORS[die['Color']], [
                 keysToImages(die['Face 1']),
                 keysToImages(die['Face 2']),
@@ -183,6 +188,18 @@ async function main() {
             ]);
             rwd.exportPNG('var/' + die['Tag'] + ".png", 3);
         }
+
+        // generate items
+        let item_cards = [];
+        for(let item of Object.values(items)) {
+            let card = new RoadWarriorItemCard(item['Name Text'], item['Body Text'], item['HP']);
+            card.draw();
+            item_cards.push(card);
+        }
+        let item_sheet = new Cardistry.Sheet(item_cards);
+        item_sheet.exportScaledPNG('var/items.png', 5, 1, true, false);
+
+        // TODO: upload sheets to google drive
     });
 }
 main();
