@@ -202,11 +202,14 @@ async function main() {
 
         // generate items
         // TODO: add support for icons in text
+        // TODO: card backs and split decks by tier
         let item_cards = [];
         for(let item of Object.values(items)) {
             let card = new RoadWarriorItemCard(item['Name Text'], item['Body Text'], item['HP'], item['Dice']);
             card.draw();
-            item_cards.push(card);
+            for(let i = 0; i < item['Qty']; i++) {
+                item_cards.push(card);
+            }
         }
         let item_sheet = new Cardistry.Sheet(item_cards);
         item_sheet.exportScaledPNG('var/items.png', 5, 1, true, false);
