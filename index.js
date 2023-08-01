@@ -31,15 +31,6 @@ cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: 'Rokkitt Light
 
 // load images
 const im = new ImageManager();
-im.loadImage('fire', 'assets/noun-fire-4798412.png');
-im.loadImage('black-die', 'assets/noun-cube-5842799-000000.png');
-im.loadImage('green-die', 'assets/noun-cube-5842799-71D358.png');
-im.loadImage('blue-die', 'assets/noun-cube-5842799-00449F.png');
-im.loadImage('purple-die', 'assets/noun-cube-5842799-C462DD.png');
-im.loadImage('gray-die', 'assets/noun-cube-5842799-D3D3D3.png');
-im.loadImage('red-die', 'assets/noun-cube-5842799-FF001C.png');
-im.loadImage('orange-die', 'assets/noun-cube-5842799-FF824A.png');
-im.loadImage('yellow-die', 'assets/noun-cube-5842799-FFD65B.png');
 
 const card_bleed = 0.125;
 const card_safe = 0.125;
