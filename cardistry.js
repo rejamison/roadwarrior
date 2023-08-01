@@ -763,6 +763,21 @@ class ImageManager {
         return this.images.get(key);
     }
 
+    getRecolored(key, color) {
+        let img = this.get(key);
+        if(img) {
+            const canvas = cvs.createCanvas(img.width, img.height);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            ctx.globalCompositeOperation = 'source-in';
+            ctx.fillStyle = '#' + color;
+            ctx.fillRect(0, 0, img.width, img.height);
+            return canvas;
+        } else {
+            console.error("Couldn't load image with key: " + key);
+        }
+    }
+
     ready(onReady) {
         Promise.all(this.promises).then(onReady);
     }

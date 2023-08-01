@@ -72,12 +72,13 @@ function rowsToObjects(rows) {
 }
 
 class RoadWarriorItemCard extends Cardistry.Card {
-    constructor(title, body, hp) {
+    constructor(title, body, hp, dice) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.title = title;
         this.body = body;
         this.hp = hp;
+        this.dice = dice;
 
         // title
         this.addElement(new Cardistry.TextBox(
@@ -103,6 +104,16 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.getDrawableBoundRect().cutTopPct(0.25),
             this.bgColor
         ));
+        if(this.dice.trim().length != 0) {
+            // TODO: add support for multiple dice
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0, 0.8, 0.9, 0),
+                this.bgColor,
+                im.getRecolored('die', COLORS[this.dice.split(",")[0].trim()]),
+                false
+            ));
+        }
         if(this.hp.trim().length != 0) {
             this.addElement(new Cardistry.ImageBox(
                 this,
@@ -190,9 +201,10 @@ async function main() {
         }
 
         // generate items
+        // TODO: add support for icons in text
         let item_cards = [];
         for(let item of Object.values(items)) {
-            let card = new RoadWarriorItemCard(item['Name Text'], item['Body Text'], item['HP']);
+            let card = new RoadWarriorItemCard(item['Name Text'], item['Body Text'], item['HP'], item['Dice']);
             card.draw();
             item_cards.push(card);
         }
