@@ -32,6 +32,10 @@ cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: 'Rokkitt Light
 // load images
 const im = new ImageManager();
 
+// create needed directories
+if(!fs.existsSync('var')) fs.mkdirSync('var');
+
+
 const card_bleed = 0.125;
 const card_safe = 0.125;
 const card_height = 2.48 + card_bleed * 2;
