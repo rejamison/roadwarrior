@@ -4,7 +4,7 @@ const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
 const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager} = require("./cardistry");
 const {loadImage} = require("canvas");
-const {getAuthToken, getSheet, getSheetValues} = require('./gsheets');
+const {getAuthToken, getSheet, getSheetValues, download} = require('./gutil');
 
 const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
 
@@ -35,93 +35,17 @@ const im = new ImageManager();
 // create needed directories
 if(!fs.existsSync('var')) fs.mkdirSync('var');
 
-
-const card_bleed = 0.125;
-const card_safe = 0.125;
-const card_height = 2.48 + card_bleed * 2;
-const card_width = 1.61 + card_bleed * 2;
-const card_extra = 0.05;
-const text_size = (card_height - 0.6) / 10.5;
-const text_margin = text_size * 0.23;
-const d6_width = 0.5;
-const d6_height = 0.5;
-
-class RoadWarriorItemCard extends Cardistry.Card {
-    constructor(dpi, bgColor, title, body, img) {
-        super(card_width, card_height, card_bleed, card_safe, card_extra, bgColor, dpi);
-
-        this.img = img;
-
-        // title
-        this.addElement(new Cardistry.TextBox(
-            this,
-            title,
-            'Rokkitt Bold',
-            '000000',
-            text_size,
-            0,
-            'left',
-            'middle',
-            this.getDrawableBoundRect().cutBottomPct(0.8),
-            this.bgColor));
-        this.addElement(new Cardistry.ImageBox(
-            this,
-            this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.4),
-            'FFFFFF',
-            this.img,
-            false
-        ));
-        this.addElement(new Cardistry.TextBox(
-            this,
-            body,
-            'Rokkitt Bold',
-            '000000',
-            text_size * 0.66,
-            0,
-            'left',
-            'middle',
-            this.getDrawableBoundRect().cutTopPct(0.6),
-            this.bgColor
-        ));
-    }
-}
-
-// TODO:  Make dark dice icons white...
-class RoadWarriorDie extends Cardistry.Sheet {
-    constructor(bgColor, faces) {
-        let cards = [];
-        for(const face of faces) {
-            let die = new Cardistry.DieFace(d6_width, d6_height, 0, 0, 0, bgColor, 300, face);
-            die.draw();
-            cards.push(die);
-        }
-
-        super(cards);
-    }
-}
-
-let dice = [];
-async function loadSheet() {
-    try {
-        const auth = await getAuthToken();
-
-        // load all the symbols
-        const symbols_response = await getSheetValues(SHEET_ID,'Symbols', auth);
-        for(const row of symbols_response.data.values.slice(1)) {
-            if(row[1] && row[1].endsWith('view?usp=drive_link')) {
-                im.loadImage(row[0], row[1].replace(/https:\/\/drive\.google\.com\/file\/d\/(.*?)\/.*?\?usp=drive_link/g, "https://drive.google.com/uc?export=view&id=$1"));
-            } else {
-                im.loadImage(row[0], row[1]);
-            }
-        }
-
-        // load all the dice
-        const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
-        dice = rowsToObjects(dice_response.data.values);
-    } catch(error) {
-        console.log(error.message, error.stack);
-    }
-}
+const CARD_BLEED = 0.125;
+const CARD_SAFE = 0.125;
+const CARD_HEIGHT = 2.48 + CARD_BLEED * 2;
+const CARD_WIDTH = 1.61 + CARD_BLEED * 2;
+const CARD_EXTRA = 0.05;
+const DEFAULT_CARD_BG_COLOR = 'FFFFFF';
+const DEFAULT_TEXT_SIZE = (CARD_HEIGHT - 0.6) / 10.5;
+const DEFAULT_TEXT_MARGIN = DEFAULT_TEXT_SIZE * 0.23;
+const DEFAULT_DPI = 300;
+const D6_WIDTH = 0.5;
+const D6_HEIGHT = 0.5;
 
 function keysToImages(str) {
     if(str.trim().length == 0) {
@@ -132,7 +56,7 @@ function keysToImages(str) {
 }
 
 function rowsToObjects(rows) {
-    let objects = [];
+    let objects = {};
     let col_names = [];
     for(let col_name of rows[0]) {
         col_names.push(col_name);
@@ -142,9 +66,95 @@ function rowsToObjects(rows) {
         for(let i = 0; i < col_names.length; i++) {
             obj[col_names[i]] = row[i];
         }
-        objects.push(obj);
+        objects[row[0]] = obj;
     }
     return objects;
+}
+
+class RoadWarriorItemCard extends Cardistry.Card {
+    constructor(title, body, img) {
+        super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
+
+        this.title = title;
+        this.body = body;
+        this.img = img;
+
+        // title
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.title,
+            'Rokkitt Bold',
+            '000000',
+            DEFAULT_TEXT_SIZE,
+            0,
+            'left',
+            'top',
+            this.getDrawableBoundRect().cutBottomPct(0.9),
+            this.bgColor));
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getDrawableBoundRect().cutPct(0, 0, 0.10, 0.5),
+            'FFFFFF',
+            this.img,
+            false
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.body,
+            'Rokkitt Bold',
+            '000000',
+            DEFAULT_TEXT_SIZE * 0.66,
+            0,
+            'left',
+            'top',
+            this.getDrawableBoundRect().cutTopPct(0.5),
+            this.bgColor
+        ));
+    }
+}
+
+// TODO:  Make dark dice icons white...
+class RoadWarriorDie extends Cardistry.Sheet {
+    constructor(bgColor, faces) {
+        let cards = [];
+        for(const face of faces) {
+            let die = new Cardistry.DieFace(D6_WIDTH, D6_HEIGHT, 0, 0, 0, bgColor, 300, face);
+            die.draw();
+            cards.push(die);
+        }
+
+        super(cards);
+    }
+}
+
+let dice = {};
+let items = {};
+async function loadSheet() {
+    try {
+        const auth = await getAuthToken();
+
+        // load all the symbols
+        const symbols_response = await getSheetValues(SHEET_ID,'Symbols', auth);
+        for(const row of symbols_response.data.values.slice(1)) {
+            if(row[1] && row[1].endsWith('view?usp=drive_link')) {
+                const id = row[1].replace(/https:\/\/drive\.google\.com\/file\/d\/(.*?)\/.*?\?usp=drive_link/g, "$1");
+                const file = await download(id, auth);
+                im.loadImage(row[0], file);
+            } else {
+                im.loadImage(row[0], row[1]);
+            }
+        }
+
+        // load all the dice
+        const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
+        dice = rowsToObjects(dice_response.data.values);
+
+        // load all the items
+        const items_response = await getSheetValues(SHEET_ID, 'Items', auth);
+        items = rowsToObjects(items_response.data.values);
+    } catch(error) {
+        console.log(error.message, error.stack);
+    }
 }
 
 async function main() {
@@ -152,8 +162,6 @@ async function main() {
 
     im.ready(() => {
         let card = new RoadWarriorItemCard(
-            300,
-            'FFFFFF',
             'Test Card',
             "This is a test card body...",
             im.get('shield')
@@ -162,7 +170,9 @@ async function main() {
         card.exportScaledPNG('test.png', 1, true);
 
         // generate dice
-        for(let die of dice) {
+        for(let die of Object.values(dice)) {
+            console.log(JSON.stringify(die, null, 2));
+
             let rwd = new RoadWarriorDie(COLORS[die['Color']], [
                 keysToImages(die['Face 1']),
                 keysToImages(die['Face 2']),
