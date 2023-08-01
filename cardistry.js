@@ -751,7 +751,7 @@ class ImageManager {
                 loadImage(file).then((img) => {
                     that.images.set(key, img);
                     resolve();
-                });
+                }).catch(err => console.error('Failed to load image: ' + key + "|" + file));
             }));
         }
     }

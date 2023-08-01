@@ -113,17 +113,7 @@ async function loadSheet() {
 
         // load all the dice
         const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
-        let col_names = [];
-        for(let col_name of dice_response.data.values[0]) {
-            col_names.push(col_name);
-        }
-        for(let row of dice_response.data.values.slice(1)) {
-            let die = {};
-            for(let i = 0; i < col_names.length; i++) {
-                die[col_names[i]] = row[i];
-            }
-            dice.push(die);
-        }
+        dice = rowsToObjects(dice_response.data.values);
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -135,6 +125,22 @@ function keysToImages(str) {
     } else {
         return str.split(/[ ,]+/).map(tag => im.get(tag));
     }
+}
+
+function rowsToObjects(rows) {
+    let objects = [];
+    let col_names = [];
+    for(let col_name of rows[0]) {
+        col_names.push(col_name);
+    }
+    for(let row of rows.slice(1)) {
+        let obj = {};
+        for(let i = 0; i < col_names.length; i++) {
+            obj[col_names[i]] = row[i];
+        }
+        objects.push(obj);
+    }
+    return objects;
 }
 
 async function main() {
