@@ -4,6 +4,21 @@ const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
 const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager} = require("./cardistry");
 const {loadImage} = require("canvas");
+const {getAuthToken, getSheet, getSheetValues} = require('./gsheets');
+
+const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
+
+const COLORS = {
+    'blue': '00449F',
+    'black': 'FFFFFF',
+    'green': '71D358',
+    'orange': 'FF824A',
+    'purple': 'C462DD',
+    'red': 'FF001C',
+    'yellow': 'FFD65B',
+    'grey': 'D3D3D3',
+    'gray': 'D3D3D3'
+};
 
 // setup the randomizer
 rnd.seed(Date.now().toString());
@@ -16,9 +31,7 @@ cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: 'Rokkitt Light
 
 // load images
 const im = new ImageManager();
-im.loadImage('attack', 'assets/noun-fight-1279715.png');
 im.loadImage('fire', 'assets/noun-fire-4798412.png');
-im.loadImage('shield', 'assets/noun-shield-3000252.png');
 im.loadImage('black-die', 'assets/noun-cube-5842799-000000.png');
 im.loadImage('green-die', 'assets/noun-cube-5842799-71D358.png');
 im.loadImage('blue-die', 'assets/noun-cube-5842799-00449F.png');
@@ -92,86 +105,73 @@ class RoadWarriorDie extends Cardistry.Sheet {
     }
 }
 
+let dice = [];
+async function loadSheet() {
+    try {
+        const auth = await getAuthToken();
 
-im.ready(() => {
-    let card = new RoadWarriorItemCard(
-        300,
-        'FFFFFF',
-        'Test Card',
-        "This is a test card body...",
-        im.get('shield')
-    );
-    card.draw();
-    card.exportScaledPNG('test.png', 1, true);
+        // load all the symbols
+        const symbols_response = await getSheetValues(SHEET_ID,'Symbols', auth);
+        for(const row of symbols_response.data.values.slice(1)) {
+            if(row[1] && row[1].endsWith('view?usp=drive_link')) {
+                im.loadImage(row[0], row[1].replace(/https:\/\/drive\.google\.com\/file\/d\/(.*?)\/.*?\?usp=drive_link/g, "https://drive.google.com/uc?export=view&id=$1"));
+            } else {
+                im.loadImage(row[0], row[1]);
+            }
+        }
 
-    let yellow_d6 = new RoadWarriorDie('FFD65B', [
-        [],
-        [im.get('attack')],
-        [im.get('attack'), im.get('fire')],
-        [im.get('attack'), im.get('attack')],
-        [im.get('attack')],
-        [im.get('shield')]
-    ]);
-    yellow_d6.exportPNG('var/d6_yellow.png', 3);
+        // load all the dice
+        const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
+        let col_names = [];
+        for(let col_name of dice_response.data.values[0]) {
+            col_names.push(col_name);
+        }
+        for(let row of dice_response.data.values.slice(1)) {
+            let die = {};
+            for(let i = 0; i < col_names.length; i++) {
+                die[col_names[i]] = row[i];
+            }
+            dice.push(die);
+        }
+    } catch(error) {
+        console.log(error.message, error.stack);
+    }
+}
 
-    let blue_d6 = new RoadWarriorDie('00449F', [
-        [],
-        [im.get('shield'), im.get('shield')],
-        [im.get('shield')],
-        [im.get('shield')],
-        [im.get('shield')],
-        [im.get('attack')]
-    ]);
-    blue_d6.exportPNG('var/d6_blue.png', 3);
+function keysToImages(str) {
+    if(str.trim().length == 0) {
+        return [];
+    } else {
+        return str.split(/[ ,]+/).map(tag => im.get(tag));
+    }
+}
 
-    let green_d6 = new RoadWarriorDie('71D358', [
-        [],
-        [im.get('shield'), im.get('fire')],
-        [im.get('shield'), im.get('shield')],
-        [im.get('shield'), im.get('shield')],
-        [im.get('attack'), im.get('shield')],
-        [im.get('shield')],
-    ]);
-    green_d6.exportPNG('var/d6_green.png', 3);
+async function main() {
+    await loadSheet();
 
-    let black_d6 = new RoadWarriorDie('000000', [
-        [],
-        [im.get('shield')],
-        [im.get('shield')],
-        [im.get('shield'), im.get('attack')],
-        [im.get('attack')],
-        [im.get('attack')],
+    im.ready(() => {
+        let card = new RoadWarriorItemCard(
+            300,
+            'FFFFFF',
+            'Test Card',
+            "This is a test card body...",
+            im.get('shield')
+        );
+        card.draw();
+        card.exportScaledPNG('test.png', 1, true);
 
-    ]);
-    black_d6.exportPNG('var/d6_black.png', 3);
-
-    let orange_d6 = new RoadWarriorDie('FF824A', [
-        [],
-        [im.get('attack')],
-        [im.get('attack'), im.get('fire'), im.get('attack')],
-        [im.get('attack'), im.get('attack'), im.get('attack')],
-        [im.get('attack'), im.get('fire')],
-        [im.get('shield')]
-    ]);
-    orange_d6.exportPNG('var/d6_orange.png', 3);
-
-    let red_d6 = new RoadWarriorDie('FF001C', [
-        [im.get('attack')],
-        [im.get('attack')],
-        [im.get('attack'), im.get('fire'), im.get('attack')],
-        [im.get('attack'), im.get('attack'), im.get('attack')],
-        [im.get('attack'), im.get('fire'), im.get('shield')],
-        [im.get('shield'), im.get('attack')]
-    ]);
-    red_d6.exportPNG('var/d6_red.png', 3);
-
-    let purple_d6 = new RoadWarriorDie('C462DD', [
-        [],
-        [im.get('fire')],
-        [im.get('attack'), im.get('fire')],
-        [im.get('attack'), im.get('attack'), im.get('fire')],
-        [im.get('attack'), im.get('fire'), im.get('fire')],
-        [im.get('shield')]
-    ]);
-    purple_d6.exportPNG('var/d6_purple.png', 3);
-});
+        // generate dice
+        for(let die of dice) {
+            let rwd = new RoadWarriorDie(COLORS[die['Color']], [
+                keysToImages(die['Face 1']),
+                keysToImages(die['Face 2']),
+                keysToImages(die['Face 3']),
+                keysToImages(die['Face 4']),
+                keysToImages(die['Face 5']),
+                keysToImages(die['Face 6'])
+            ]);
+            rwd.exportPNG('var/' + die['Tag'] + ".png", 3);
+        }
+    });
+}
+main();

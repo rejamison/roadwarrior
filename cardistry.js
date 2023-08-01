@@ -744,13 +744,16 @@ class ImageManager {
     }
 
     loadImage(key, file) {
-        let that = this;
-        this.promises.push(new Promise(function(resolve, reject) {
-            loadImage(file).then((img) => {
-                that.images.set(key, img);
-                resolve();
-            });
-        }));
+        if(key && file) {
+            let that = this;
+            this.promises.push(new Promise(function(resolve, reject) {
+                console.log("Registering image: " + key + "|" + file);
+                loadImage(file).then((img) => {
+                    that.images.set(key, img);
+                    resolve();
+                });
+            }));
+        }
     }
 
     get(key) {

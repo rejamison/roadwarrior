@@ -106,3 +106,4 @@ dist
 /var/
 /.idea/
 .DS_Store
+/keys/
