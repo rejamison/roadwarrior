@@ -133,6 +133,68 @@ function someOrNone(str) {
     }
 }
 
+function convertToFilename(str) {
+    return str.toLowerCase().replace(/[ -]+/, '_');
+}
+
+function decksByFields(deck, field1, field2) {
+    let decks = {};
+
+    for(let card of Object.values(deck)) {
+        let key = (field1 && field2) ? card[field1] + ' ' + card[field2] : card[field1];
+        let obj = decks[key];
+        if(!obj) {
+            decks[key] = {};
+            obj = decks[key];
+        }
+        decks[key][card['Tag']] = card;
+    }
+
+    return decks;
+}
+
+class RoadWarriorCardBack extends Cardistry.Card {
+    constructor(deckName, icon, bgColor, isLandscape) {
+        super(isLandscape ? CARD_HEIGHT : CARD_WIDTH, isLandscape ? CARD_WIDTH : CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, bgColor, DEFAULT_DPI);
+
+        this.deckName = deckName;
+        this.deckImage = im.get(icon);
+
+        if(this.deckImage) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.deckName,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 2,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect().cutTopPct(0.5),
+                this.bgColor));
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutBottomPct(0.5),
+                this.bgColor,
+                this.deckImage,
+                false
+            ));
+        } else {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.deckName,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 2,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect(),
+                this.bgColor));
+        }
+    }
+}
+
 class RoadWarriorItemCard extends Cardistry.Card {
     constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
@@ -426,7 +488,7 @@ async function loadSheet() {
 
         // load all the items
         const items_response = await getSheetValues(SHEET_ID, 'Items', auth);
-        items = rowsToObjects(items_response.data.values);
+        items = decksByFields(rowsToObjects(items_response.data.values), 'Tier');
 
         // load all the vehicles
         const vehicles_response = await getSheetValues(SHEET_ID, 'Vehicles', auth);
@@ -434,7 +496,7 @@ async function loadSheet() {
 
         // load all the ais
         const ais_response = await getSheetValues(SHEET_ID, 'Enemy AI', auth);
-        ais = rowsToObjects(ais_response.data.values);
+        ais = decksByFields(rowsToObjects(ais_response.data.values), 'Faction', 'Vehicle');
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -459,27 +521,32 @@ async function main() {
 
         // generate items
         // TODO: add support for icons in text
-        // TODO: card backs and split decks by tier
-        let item_cards = [];
-        for(let item of Object.values(items)) {
-            let card = new RoadWarriorItemCard(
-                item['Name Text'],
-                item['Body Text'],
-                item['HP'],
-                item['Dice'],
-                item['Slots'],
-                item['Attack Cost'],
-                item['Attack Effect'],
-                item['Attack Arc'],
-                item['Attack Range']);
-            card.draw();
-            for(let i = 0; i < item['Qty']; i++) {
-                item_cards.push(card);
+        for(let deckName in items) {
+            let deck = items[deckName];
+            let item_cards = [];
+            for(let item of Object.values(deck)) {
+                let card = new RoadWarriorItemCard(
+                    item['Name Text'],
+                    item['Body Text'],
+                    item['HP'],
+                    item['Dice'],
+                    item['Slots'],
+                    item['Attack Cost'],
+                    item['Attack Effect'],
+                    item['Attack Arc'],
+                    item['Attack Range']);
+                card.draw();
+                for(let i = 0; i < item['Qty']; i++) {
+                    item_cards.push(card);
+                }
             }
+            let item_sheet = new Cardistry.Sheet(item_cards);
+            item_sheet.exportScaledPNG('var/tts/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
+            item_sheet.exportScaledPNG('var/pnp/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
+            let item_back = new RoadWarriorCardBack(deckName + ' Items', null, COLORS.blue);
+            item_back.draw();
+            item_back.exportPNG('var/tts/item_' + convertToFilename(deckName) + '_back.png');
         }
-        let item_sheet = new Cardistry.Sheet(item_cards);
-        item_sheet.exportScaledPNG('var/tts/items.png', 5, 1, true, false);
-        item_sheet.exportScaledPNG('var/pnp/items.png', 5, 1, true, true);
 
         // generate initiative cards
         let init_cards = [];
@@ -496,28 +563,37 @@ async function main() {
             init_cards.push(card);
         }
         let init_sheet = new Cardistry.Sheet(init_cards);
-        init_sheet.exportScaledPNG('var/tts/initiatives.png', 3, 1, true, false);
-        init_sheet.exportScaledPNG('var/pnp/initiatives.png', 3, 1, true, true);
+        init_sheet.exportScaledPNG('var/tts/initiative_fronts.png', 3, 1, true, false);
+        init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 3, 1, true, true);
+        let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, true);
+        init_back.draw();
+        init_back.exportPNG('var/tts/initiative_back.png');
 
-        // generate initiative cards
-        let ai_cards = [];
-        for(let ai of Object.values(ais)) {
-            let card = new RoadWarriorAICard(
-                ai['Faction'],
-                ai['Vehicle'],
-                ai['Name Text'],
-                ai['Arc'],
-                ai['Body Text'],
-                ai['Chain?']
-            )
-            card.draw();
-            for(let i = 0; i < ai['Qty']; i++) {
-                ai_cards.push(card);
+        // generate AI cards
+        for(let deckName in ais) {
+            let deck = ais[deckName];
+            let ai_cards = [];
+            for (let ai of Object.values(deck)) {
+                let card = new RoadWarriorAICard(
+                    ai['Faction'],
+                    ai['Vehicle'],
+                    ai['Name Text'],
+                    ai['Arc'],
+                    ai['Body Text'],
+                    ai['Chain?']
+                )
+                card.draw();
+                for (let i = 0; i < ai['Qty']; i++) {
+                    ai_cards.push(card);
+                }
             }
+            let ai_sheet = new Cardistry.Sheet(ai_cards);
+            ai_sheet.exportScaledPNG('var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
+            ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
+            let item_back = new RoadWarriorCardBack(deckName + ' AI', null, COLORS.gray);
+            item_back.draw();
+            item_back.exportPNG('var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
-        let ai_sheet = new Cardistry.Sheet(ai_cards);
-        ai_sheet.exportScaledPNG('var/tts/ais.png', 5, 1, true, false);
-        ai_sheet.exportScaledPNG('var/pnp/ais.png', 5, 1, true, true);
 
         // TODO: upload sheets to google drive
     });
