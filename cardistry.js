@@ -230,6 +230,7 @@ class Box extends CardElement {
 }
 exports.Box = Box;
 
+// TODO:  Allow for horizontal or vertical alignment.
 class ImageBox extends Box {
     constructor(parent, boundRect, bgColor, image, stretch) {
         super(parent, boundRect, bgColor);

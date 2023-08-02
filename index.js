@@ -35,6 +35,8 @@ const im = new ImageManager();
 // create needed directories
 if(!fs.existsSync('var')) fs.mkdirSync('var');
 if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
+if(!fs.existsSync('var/tts')) fs.mkdirSync('var/tts');
+if(!fs.existsSync('var/pnp')) fs.mkdirSync('var/pnp');
 
 const CARD_BLEED = 0.125;
 const CARD_SAFE = 0.125;
@@ -64,6 +66,25 @@ function keysToInvertedImages(str, bgColor) {
     }
 }
 
+function renderArc(str) {
+    if(str && str.trim().length > 0) {
+        if(str === 'any') {
+            return im.get('any');
+        } else if(str === 'by_slot') {
+            return im.get('by_slot');
+        } else {
+            let arcs = keysToImages(str);
+            arcs.push(im.get('arc'));
+            const canvas = cvs.createCanvas(arcs[0].width, arcs[0].height);
+            const ctx = canvas.getContext('2d');
+            for(let arc of arcs) {
+                ctx.drawImage(arc, 0, 0);
+            }
+            return canvas;
+        }
+    }
+}
+
 function rowsToObjects(rows) {
     let objects = {};
     let col_names = [];
@@ -80,8 +101,27 @@ function rowsToObjects(rows) {
     return objects;
 }
 
+function addImagesRow(parent, images, boundaryRect, bgColor) {
+    if(images && images.length > 0) {
+        for(let i = 0; i < images.length; i++) {
+            let image = images[i];
+            if(image) {
+                parent.addElement(new Cardistry.ImageBox(
+                    parent,
+                    boundaryRect.cutPct((1 / images.length) * i, (1 / images.length) * (images.length - i - 1), 0, 0),
+                    bgColor ? bgColor : parent.bgColor,
+                    image,
+                    false
+                ));
+            } else {
+                console.error('Missing image...');
+            }
+        }
+    }
+}
+
 class RoadWarriorItemCard extends Cardistry.Card {
-    constructor(title, body, hp, dice) {
+    constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.title = title;
@@ -90,6 +130,12 @@ class RoadWarriorItemCard extends Cardistry.Card {
         if(dice.trim().length != 0) {
             this.dice = dice.split(',').map((die) => die.trim());
         }
+        // TODO: Use different images for slots vs. arcs?
+        this.slotsImage = renderArc(slots);
+        this.attackCostImages = keysToImages(attackCost);
+        this.attackEffectText = attackEffect;
+        this.attackArcImage = renderArc(attackArc);
+        this.attackRange = attackRange;
 
         // title
         this.addElement(new Cardistry.TextBox(
@@ -97,51 +143,64 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.title,
             'Rokkitt Bold',
             '000000',
-            DEFAULT_TEXT_SIZE,
+            DEFAULT_TEXT_SIZE * 0.75,
             0,
             'left',
             'top',
-            this.getDrawableBoundRect().cutBottomPct(0.8),
+            this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
-        this.addElement(new Cardistry.TextBox(
-            this,
-            this.body,
-            'Rokkitt Bold',
-            '000000',
-            DEFAULT_TEXT_SIZE * 0.66,
-            0,
-            'left',
-            'middle',
-            this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
-            this.bgColor
-        ));
-        if(this.dice) {
+
+        if(this.attackCostImages.length > 0) {
+            let attackBoxRect = this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.2);
+            let attackBoxBgColor = COLORS['gray'];
+            this.addElement(new Cardistry.Box(this, attackBoxRect, attackBoxBgColor));
+            attackBoxRect = attackBoxRect.shrink(20);
+            addImagesRow(this, this.attackCostImages, attackBoxRect.cutPct(0, 0.66, 0, 0.8), attackBoxBgColor);
             this.addElement(new Cardistry.ImageBox(
                 this,
-                this.getDrawableBoundRect().cutPct(0, 0.8, 0.9, 0),
-                this.bgColor,
-                im.getRecolored('die', COLORS[this.dice[0]]),
+                attackBoxRect.cutPct(0, 0.66, 0.2, 0),
+                attackBoxBgColor,
+                this.attackArcImage,
                 false
             ));
-            if(this.dice.length == 2) {
-                this.addElement(new Cardistry.ImageBox(
-                    this,
-                    this.getDrawableBoundRect().cutPct(0.2, 0.6, 0.9, 0),
-                    this.bgColor,
-                    im.getRecolored('die', COLORS[this.dice[1]]),
-                    false
-                ));
-            } else if(this.dice.length == 3) {
-                this.addElement(new Cardistry.ImageBox(
-                    this,
-                    this.getDrawableBoundRect().cutPct(0.4, 0.4, 0.9, 0),
-                    this.bgColor,
-                    im.getRecolored('die', COLORS[this.dice[2]]),
-                    false
-                ));
-            } else if(this.dice.length > 3) {
-                console.error("Strange number of dice detected in card: " + this.title);
-            }
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.attackEffectText,
+                'Rokkitt',
+                '000000',
+                DEFAULT_TEXT_SIZE * 0.6,
+                0,
+                'left',
+                'top',
+                attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
+                attackBoxBgColor
+            ));
+        } else {
+            // TODO: Support for inline symbols...
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.body,
+                'Rokkitt',
+                '000000',
+                DEFAULT_TEXT_SIZE * 0.7,
+                0,
+                'left',
+                'middle',
+                this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
+                this.bgColor
+            ));
+        }
+        if(this.slotsImage) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0, 0.9),
+                this.bgColor,
+                this.slotsImage,
+                false
+            ));
+        }
+        if(this.dice) {
+            addImagesRow(this, this.dice.map((x) => im.getRecolored('die', COLORS[x])), this.getDrawableBoundRect().cutPct(0, 0.5, 0.9, 0));
         }
         if(this.hp.trim().length != 0) {
             this.addElement(new Cardistry.ImageBox(
@@ -167,7 +226,6 @@ class RoadWarriorItemCard extends Cardistry.Card {
     }
 }
 
-// TODO:  Make dark dice icons white...
 class RoadWarriorDie extends Cardistry.Sheet {
     constructor(bgColor, faces) {
         let cards = [];
@@ -226,7 +284,7 @@ async function main() {
                 keysToInvertedImages(die['Face 5'], COLORS[die['Color']]),
                 keysToInvertedImages(die['Face 6'], COLORS[die['Color']])
             ]);
-            rwd.exportPNG('var/' + die['Tag'] + ".png", 3);
+            rwd.exportPNG('var/tts/' + die['Tag'] + ".png", 3);
         }
 
         // generate items
@@ -234,14 +292,24 @@ async function main() {
         // TODO: card backs and split decks by tier
         let item_cards = [];
         for(let item of Object.values(items)) {
-            let card = new RoadWarriorItemCard(item['Name Text'], item['Body Text'], item['HP'], item['Dice']);
+            let card = new RoadWarriorItemCard(
+                item['Name Text'],
+                item['Body Text'],
+                item['HP'],
+                item['Dice'],
+                item['Slots'],
+                item['Attack Cost'],
+                item['Attack Effect'],
+                item['Attack Arc'],
+                item['Attack Range']);
             card.draw();
             for(let i = 0; i < item['Qty']; i++) {
                 item_cards.push(card);
             }
         }
         let item_sheet = new Cardistry.Sheet(item_cards);
-        item_sheet.exportScaledPNG('var/items.png', 5, 1, true, false);
+        item_sheet.exportScaledPNG('var/tts/items.png', 5, 1, true, false);
+        item_sheet.exportScaledPNG('var/pnp/items.png', 5, 1, true, true);
 
         // TODO: upload sheets to google drive
     });
