@@ -17,7 +17,8 @@ const COLORS = {
     'red': 'FF001C',
     'yellow': 'FFD65B',
     'grey': 'D3D3D3',
-    'gray': 'D3D3D3'
+    'gray': 'D3D3D3',
+    'pink': 'FFC0CB'
 };
 
 // setup the randomizer
@@ -120,14 +121,24 @@ function addImagesRow(parent, images, boundaryRect, bgColor) {
     }
 }
 
+function someOrNone(str) {
+    if(!str) {
+        return null;
+    } else if(str.trim().length == 0) {
+        return null;
+    } else {
+        return str.trim();
+    }
+}
+
 class RoadWarriorItemCard extends Cardistry.Card {
     constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.title = title;
         this.body = body;
-        this.hp = hp;
-        if(dice.trim().length != 0) {
+        this.hp = someOrNone(hp);
+        if(someOrNone(dice)) {
             this.dice = dice.split(',').map((die) => die.trim());
         }
         // TODO: Use different images for slots vs. arcs?
@@ -202,7 +213,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
         if(this.dice) {
             addImagesRow(this, this.dice.map((x) => im.getRecolored('die', COLORS[x])), this.getDrawableBoundRect().cutPct(0, 0.5, 0.9, 0));
         }
-        if(this.hp.trim().length != 0) {
+        if(this.hp) {
             this.addElement(new Cardistry.ImageBox(
                 this,
                 this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
@@ -226,6 +237,87 @@ class RoadWarriorItemCard extends Cardistry.Card {
     }
 }
 
+class RoadWarriorInitiativeCard extends Cardistry.Card {
+    constructor(faction, name, hp, color, toughness, quantity) {
+        super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
+
+        this.faction = faction;
+        this.name = name;
+        this.hp = someOrNone(hp);
+        this.color = someOrNone(color);
+        this.toughness = someOrNone(toughness);
+        this.quantity = someOrNone(quantity);
+
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.faction + '\n' + this.name,
+            'Rokkitt Bold',
+            '000000',
+            DEFAULT_TEXT_SIZE * 1.2,
+            0,
+            'center',
+            'middle',
+            this.getDrawableBoundRect().shrink(100),
+            this.bgColor));
+        if(this.toughness) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.toughness,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 1.1,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect().cutPct(0.85, 0, 0, 0.7),
+                this.bgColor
+            ));
+        }
+        if(this.quantity) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.quantity + 'X',
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 1.1,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect().cutPct(0, 0.85, 0.7, 0),
+                this.bgColor
+            ));
+        }
+        if(this.color) {
+            this.addElement(new Cardistry.Box(
+                this,
+                this.getDrawableBoundRect().cutPct(0, 0.85, 0, 0.7),
+                COLORS[this.color]
+            ));
+        }
+        if(this.hp) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
+                this.bgColor,
+                im.get('shield'),
+                false
+            ));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                '' + hp,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 1.1,
+                0,
+                'center',
+                'middle',
+                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
+                this.bgColor
+            ));
+        }
+    }
+}
+
 class RoadWarriorDie extends Cardistry.Sheet {
     constructor(bgColor, faces) {
         let cards = [];
@@ -241,6 +333,7 @@ class RoadWarriorDie extends Cardistry.Sheet {
 
 let dice = {};
 let items = {};
+let vehicles = {};
 async function loadSheet() {
     try {
         const auth = await getAuthToken();
@@ -265,6 +358,10 @@ async function loadSheet() {
         // load all the items
         const items_response = await getSheetValues(SHEET_ID, 'Items', auth);
         items = rowsToObjects(items_response.data.values);
+
+        // load all the vehicles
+        const vehicles_response = await getSheetValues(SHEET_ID, 'Vehicles', auth);
+        vehicles = rowsToObjects(vehicles_response.data.values);
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -310,6 +407,24 @@ async function main() {
         let item_sheet = new Cardistry.Sheet(item_cards);
         item_sheet.exportScaledPNG('var/tts/items.png', 5, 1, true, false);
         item_sheet.exportScaledPNG('var/pnp/items.png', 5, 1, true, true);
+
+        // generate initiative cards
+        let init_cards = [];
+        for(let vehicle of Object.values(vehicles)) {
+            let card = new RoadWarriorInitiativeCard(
+                vehicle['Faction'],
+                vehicle['Name Text'],
+                vehicle['HP'],
+                vehicle['Color'],
+                vehicle['Tough.'],
+                vehicle['Qty']
+            )
+            card.draw();
+            init_cards.push(card);
+        }
+        let init_sheet = new Cardistry.Sheet(init_cards);
+        init_sheet.exportScaledPNG('var/tts/initiatives.png', 3, 1, true, false);
+        init_sheet.exportScaledPNG('var/pnp/initiatives.png', 3, 1, true, true);
 
         // TODO: upload sheets to google drive
     });
