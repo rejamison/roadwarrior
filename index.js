@@ -18,7 +18,9 @@ const COLORS = {
     'yellow': 'FFD65B',
     'grey': 'D3D3D3',
     'gray': 'D3D3D3',
-    'pink': 'FFC0CB'
+    'pink': 'FFC0CB',
+    'light_gray': 'E8E8E8',
+    'light_grey': 'E8E8E8'
 };
 
 // setup the randomizer
@@ -169,7 +171,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
             addImagesRow(this, this.attackCostImages, attackBoxRect.cutPct(0, 0.66, 0, 0.8), attackBoxBgColor);
             this.addElement(new Cardistry.ImageBox(
                 this,
-                attackBoxRect.cutPct(0, 0.66, 0.2, 0),
+                attackBoxRect.cutPct(0, 0.66, 0.2, 0.2),
                 attackBoxBgColor,
                 this.attackArcImage,
                 false
@@ -182,8 +184,20 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 DEFAULT_TEXT_SIZE * 0.6,
                 0,
                 'left',
-                'top',
+                'middle',
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
+                attackBoxBgColor
+            ));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.attackRange,
+                'Rokkitt Bold',
+                '000000',
+                DEFAULT_TEXT_SIZE * 0.5,
+                0,
+                'center',
+                'middle',
+                attackBoxRect.cutPct(0, 0.66, 0.8, 0),
                 attackBoxBgColor
             ));
         } else {
