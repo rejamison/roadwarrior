@@ -10,7 +10,7 @@ const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
 
 const COLORS = {
     'blue': '00449F',
-    'black': 'FFFFFF',
+    'black': '000000',
     'green': '71D358',
     'orange': 'FF824A',
     'purple': 'C462DD',
@@ -56,6 +56,14 @@ function keysToImages(str) {
     }
 }
 
+function keysToInvertedImages(str, bgColor) {
+    if(str.trim().length == 0) {
+        return [];
+    } else {
+        return str.split(/[ ,]+/).map(tag => im.getInverted(tag, 'FFFFFF', '000000', bgColor));
+    }
+}
+
 function rowsToObjects(rows) {
     let objects = {};
     let col_names = [];
@@ -93,7 +101,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
             0,
             'left',
             'top',
-            this.getDrawableBoundRect().cutBottomPct(0.9),
+            this.getDrawableBoundRect().cutBottomPct(0.8),
             this.bgColor));
         this.addElement(new Cardistry.TextBox(
             this,
@@ -103,8 +111,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             DEFAULT_TEXT_SIZE * 0.66,
             0,
             'left',
-            'top',
-            this.getDrawableBoundRect().cutTopPct(0.25),
+            'middle',
+            this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
             this.bgColor
         ));
         if(this.dice) {
@@ -131,7 +139,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
                     im.getRecolored('die', COLORS[this.dice[2]]),
                     false
                 ));
-            } else {
+            } else if(this.dice.length > 3) {
                 console.error("Strange number of dice detected in card: " + this.title);
             }
         }
@@ -156,7 +164,6 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 this.bgColor
             ));
         }
-
     }
 }
 
@@ -185,6 +192,7 @@ async function loadSheet() {
         for(const row of symbols_response.data.values.slice(1)) {
             if(row[1] && row[1].endsWith('view?usp=drive_link')) {
                 const id = row[1].replace(/https:\/\/drive\.google\.com\/file\/d\/(.*?)\/.*?\?usp=drive_link/g, "$1");
+                // TODO: use tmp as cache
                 const file = await download(id, auth);
                 im.loadImage(row[0], file);
             } else {
@@ -211,12 +219,12 @@ async function main() {
         // generate dice
         for(let die of Object.values(dice)) {
             let rwd = new RoadWarriorDie(COLORS[die['Color']], [
-                keysToImages(die['Face 1']),
-                keysToImages(die['Face 2']),
-                keysToImages(die['Face 3']),
-                keysToImages(die['Face 4']),
-                keysToImages(die['Face 5']),
-                keysToImages(die['Face 6'])
+                keysToInvertedImages(die['Face 1'], COLORS[die['Color']]),
+                keysToInvertedImages(die['Face 2'], COLORS[die['Color']]),
+                keysToInvertedImages(die['Face 3'], COLORS[die['Color']]),
+                keysToInvertedImages(die['Face 4'], COLORS[die['Color']]),
+                keysToInvertedImages(die['Face 5'], COLORS[die['Color']]),
+                keysToInvertedImages(die['Face 6'], COLORS[die['Color']])
             ]);
             rwd.exportPNG('var/' + die['Tag'] + ".png", 3);
         }

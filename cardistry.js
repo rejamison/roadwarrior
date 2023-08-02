@@ -85,11 +85,11 @@ class BoundaryRect {
         return new BoundaryRect(this.x + l, this.y + t, this.w - l - r, this.h - t - b);
     }
 
-    cutPct(lp, lr, lt, lb) {
+    cutPct(lp, rp, tp, bp) {
         let cutl = this.w * lp;
-        let cutr = this.w * lr;
-        let cutt = this.h * lt;
-        let cutb = this.h * lb;
+        let cutr = this.w * rp;
+        let cutt = this.h * tp;
+        let cutb = this.h * bp;
         return new BoundaryRect(this.x + cutl, this.y + cutt, this.w - cutl - cutr, this.h - cutt - cutb);
     }
 }
@@ -775,6 +775,21 @@ class ImageManager {
             return canvas;
         } else {
             console.error("Couldn't load image with key: " + key);
+        }
+    }
+
+    _isDark(color) {
+        return color && (((parseInt(color.slice(0,2), 16) + parseInt(color.slice(2,4), 16) + parseInt(color.slice(4,6), 16)) / 3) < 128);
+    }
+
+    getInverted(key, colorIfDark, colorIfLight, bgColor) {
+        let img = this.get(key);
+        if(img) {
+            if(this._isDark(bgColor)) {
+                return this.getRecolored(key, colorIfDark);
+            } else {
+                return this.getRecolored(key, colorIfLight);
+            }
         }
     }
 
