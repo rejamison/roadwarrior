@@ -34,6 +34,7 @@ const im = new ImageManager();
 
 // create needed directories
 if(!fs.existsSync('var')) fs.mkdirSync('var');
+if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
 
 const CARD_BLEED = 0.125;
 const CARD_SAFE = 0.125;
