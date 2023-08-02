@@ -237,6 +237,60 @@ class RoadWarriorItemCard extends Cardistry.Card {
     }
 }
 
+class RoadWarriorAICard extends Cardistry.Card {
+    constructor(faction, vehicle, title, arc, body, chain) {
+        super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
+
+        this.faction = faction;
+        this.vehicle = vehicle;
+        this.title = title;
+        this.attackArcImage = renderArc(arc);
+        this.body = body;
+        this.chainImage = chain === 'Y' ? im.get('chain') : null;
+
+        // title
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.title,
+            'Rokkitt Bold',
+            '000000',
+            DEFAULT_TEXT_SIZE * 0.75,
+            0,
+            'left',
+            'top',
+            this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
+            this.bgColor));
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.55),
+            this.bgColor,
+            this.attackArcImage,
+            false
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.body,
+            'Rokkitt',
+            '000000',
+            DEFAULT_TEXT_SIZE * 0.65,
+            0,
+            'left',
+            'middle',
+            this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
+            this.bgColor
+        ));
+        if(this.chainImage) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
+                this.bgColor,
+                this.chainImage,
+                false
+            ));
+        }
+    }
+}
+
 class RoadWarriorInitiativeCard extends Cardistry.Card {
     constructor(faction, name, hp, color, toughness, quantity) {
         super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
@@ -334,6 +388,7 @@ class RoadWarriorDie extends Cardistry.Sheet {
 let dice = {};
 let items = {};
 let vehicles = {};
+let ais = {};
 async function loadSheet() {
     try {
         const auth = await getAuthToken();
@@ -362,6 +417,10 @@ async function loadSheet() {
         // load all the vehicles
         const vehicles_response = await getSheetValues(SHEET_ID, 'Vehicles', auth);
         vehicles = rowsToObjects(vehicles_response.data.values);
+
+        // load all the ais
+        const ais_response = await getSheetValues(SHEET_ID, 'Enemy AI', auth);
+        ais = rowsToObjects(ais_response.data.values);
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -425,6 +484,26 @@ async function main() {
         let init_sheet = new Cardistry.Sheet(init_cards);
         init_sheet.exportScaledPNG('var/tts/initiatives.png', 3, 1, true, false);
         init_sheet.exportScaledPNG('var/pnp/initiatives.png', 3, 1, true, true);
+
+        // generate initiative cards
+        let ai_cards = [];
+        for(let ai of Object.values(ais)) {
+            let card = new RoadWarriorAICard(
+                ai['Faction'],
+                ai['Vehicle'],
+                ai['Name Text'],
+                ai['Arc'],
+                ai['Body Text'],
+                ai['Chain?']
+            )
+            card.draw();
+            for(let i = 0; i < ai['Qty']; i++) {
+                ai_cards.push(card);
+            }
+        }
+        let ai_sheet = new Cardistry.Sheet(ai_cards);
+        ai_sheet.exportScaledPNG('var/tts/ais.png', 5, 1, true, false);
+        ai_sheet.exportScaledPNG('var/pnp/ais.png', 5, 1, true, true);
 
         // TODO: upload sheets to google drive
     });
