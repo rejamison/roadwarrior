@@ -79,7 +79,9 @@ class RoadWarriorItemCard extends Cardistry.Card {
         this.title = title;
         this.body = body;
         this.hp = hp;
-        this.dice = dice;
+        if(dice.trim().length != 0) {
+            this.dice = dice.split(',').map((die) => die.trim());
+        }
 
         // title
         this.addElement(new Cardistry.TextBox(
@@ -105,15 +107,33 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.getDrawableBoundRect().cutTopPct(0.25),
             this.bgColor
         ));
-        if(this.dice.trim().length != 0) {
-            // TODO: add support for multiple dice
+        if(this.dice) {
             this.addElement(new Cardistry.ImageBox(
                 this,
                 this.getDrawableBoundRect().cutPct(0, 0.8, 0.9, 0),
                 this.bgColor,
-                im.getRecolored('die', COLORS[this.dice.split(",")[0].trim()]),
+                im.getRecolored('die', COLORS[this.dice[0]]),
                 false
             ));
+            if(this.dice.length == 2) {
+                this.addElement(new Cardistry.ImageBox(
+                    this,
+                    this.getDrawableBoundRect().cutPct(0.2, 0.6, 0.9, 0),
+                    this.bgColor,
+                    im.getRecolored('die', COLORS[this.dice[1]]),
+                    false
+                ));
+            } else if(this.dice.length == 3) {
+                this.addElement(new Cardistry.ImageBox(
+                    this,
+                    this.getDrawableBoundRect().cutPct(0.4, 0.4, 0.9, 0),
+                    this.bgColor,
+                    im.getRecolored('die', COLORS[this.dice[2]]),
+                    false
+                ));
+            } else {
+                console.error("Strange number of dice detected in card: " + this.title);
+            }
         }
         if(this.hp.trim().length != 0) {
             this.addElement(new Cardistry.ImageBox(
