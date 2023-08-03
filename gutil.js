@@ -31,7 +31,7 @@ async function getSheetValues(spreadsheetId, sheetName, auth) {
     return res;
 }
 
-async function download(id, auth, callback) {
+async function download(id, auth) {
     try {
         const res = await drive.files.get({fileId : id, auth: auth, fields: 'name, modifiedTime, size'});
         const path = 'tmp/' + res.data.name;
@@ -71,9 +71,59 @@ async function download(id, auth, callback) {
     }
 }
 
+async function upload(folderId, path, auth) {
+    try {
+        let name = path.lastIndexOf('/') > 0 ? path.slice(path.lastIndexOf('/') + 1) : path;
+        // see if there's a file already there with this name
+        const resList = await drive.files.list({
+            q: 'name="' + name + '" and "' + folderId + '" in parents',
+            auth: auth
+        });
+
+        if(resList.data.files.length == 0) {
+            const res = await drive.files.create({
+                resource: {
+                    name: name,
+                    parents: [folderId]
+                },
+                media: {
+                    mimeType: 'image/png',
+                    body: fs.createReadStream(path)
+                },
+                fields: 'id',
+                auth: auth
+            });
+            console.log("Uploaded: " + path);
+            return Promise.resolve(res.data.id);
+        } else {
+            console.log(JSON.stringify(resList.data.files, null, 2));
+            const res = await drive.files.update({
+                fileId: resList.data.files[0].id,
+                resource: {
+                    name: name,
+                    parents: [folderId]
+                },
+                media: {
+                    mimeType: 'image/png',
+                    body: fs.createReadStream(path)
+                },
+                fields: 'id',
+                auth: auth
+            });
+            console.log("Updated: " + path);
+            return Promise.resolve(res.data.id);
+        }
+    } catch(err) {
+        console.error("Failed to upload file: " + path);
+        console.error(err);
+    }
+}
+
+
 module.exports = {
     getAuthToken,
     getSheet,
     getSheetValues,
-    download
+    download,
+    upload
 }

@@ -163,9 +163,14 @@ class Card {
     }
 
     exportPNG(file) {
-        const out = fs.createWriteStream(file);
-        this.canvas.createPNGStream().pipe(out);
-        out.on('finish', () => { console.log('exported card PNG: ' + file) });
+        return new Promise(resolve => {
+            const out = fs.createWriteStream(file);
+            this.canvas.createPNGStream().pipe(out);
+            out.on('finish', () => {
+                console.log('exported card PNG: ' + file);
+                resolve(file);
+            });
+        });
     }
 
     exportScaledPNG(file, pct, excludePrintableArea) {
@@ -619,7 +624,7 @@ class Sheet {
                 sheetCanvas.createPNGStream().pipe(out);
                 out.on('finish', () => {
                     console.log('exported sheet PNG: ' + file);
-                    resolve();
+                    resolve(file);
                 });
             });
         }
@@ -679,14 +684,16 @@ class Sheet {
 
                 pctx.drawImage(sheetCanvas, margin, margin);
 
-                const out = fs.createWriteStream(file);
-                printableCanvas.createPNGStream().pipe(out);
-                out.on('finish', () => { console.log('exported sheet PNG: ' + file) });
-            } else {
+            }
+
+            return new Promise(resolve => {
                 const out = fs.createWriteStream(file);
                 sheetCanvas.createPNGStream().pipe(out);
-                out.on('finish', () => { console.log('exported sheet PNG: ' + file) });
-            }
+                out.on('finish', () => {
+                    console.log('exported sheet PNG: ' + file);
+                    resolve(file);
+                });
+            });
         }
     }
 }
@@ -735,10 +742,14 @@ class Showcase extends Sheet {
             ctx.restore();
         });
 
-        // write the file
-        const out = fs.createWriteStream(file);
-        canvas.createPNGStream().pipe(out);
-        out.on('finish', () => { console.log('exported showcase PNG: ' + file) });
+        return new Promise(resolve => {
+            const out = fs.createWriteStream(file);
+            canvas.createPNGStream().pipe(out);
+            out.on('finish', () => {
+                console.log('exported showcase PNG: ' + file);
+                resolve(file);
+            });
+        });
     }
 }
 exports.Showcase = Showcase;

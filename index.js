@@ -4,9 +4,10 @@ const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
 const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager} = require("./cardistry");
 const {loadImage} = require("canvas");
-const {getAuthToken, getSheet, getSheetValues, download} = require('./gutil');
+const {getAuthToken, getSheet, getSheetValues, download, upload} = require('./gutil');
 
 const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
+const ASSET_FOLDER_ID = '1_c-ZMmwW4eUmKRfLA66aiWfX6qoMu_Ez';
 
 const COLORS = {
     'blue': '00449F',
@@ -140,7 +141,7 @@ function someOrNone(str) {
 }
 
 function convertToFilename(str) {
-    return str.toLowerCase().replace(/[ -]+/, '_');
+    return str.toLowerCase().replace(/[ -]+/g, '_');
 }
 
 function decksByFields(deck, field1, field2) {
@@ -483,9 +484,20 @@ let dice = {};
 let items = {};
 let vehicles = {};
 let ais = {};
+let auth = null;
+async function exportAndUpload(sheet, path) {
+    sheet.exportPNG(path).then((path) => {
+        return upload(ASSET_FOLDER_ID, path, auth);
+    });
+}
+async function exportScaledAndUpload(sheet, path, columns, pct, excludePrintableArea, includeHashMarks) {
+    sheet.exportScaledPNG(path, columns, pct, excludePrintableArea, includeHashMarks).then((path) => {
+        return upload(ASSET_FOLDER_ID, path, auth);
+    });
+}
 async function loadSheet() {
     try {
-        const auth = await getAuthToken();
+        auth = await getAuthToken();
 
         // load all the symbols
         const symbols_response = await getSheetValues(SHEET_ID,'Symbols', auth);
@@ -542,6 +554,7 @@ async function main() {
                     ctx.drawImage(img, 0, img.height * 0.5);
                     const out = fs.createWriteStream('var/tts/' + die['Tag'] + ".png");
                     canvas.createPNGStream().pipe(out);
+                    upload(ASSET_FOLDER_ID, 'var/tts/' + die['Tag'] + ".png", auth);
                 });
             });
         }
@@ -568,11 +581,10 @@ async function main() {
                 }
             }
             let item_sheet = new Cardistry.Sheet(item_cards);
-            item_sheet.exportScaledPNG('var/tts/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
-            item_sheet.exportScaledPNG('var/pnp/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
+            exportScaledAndUpload(item_sheet, 'var/tts/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             let item_back = new RoadWarriorCardBack(deckName + ' Items', null, COLORS.blue, COLORS.white);
             item_back.draw();
-            item_back.exportPNG('var/tts/item_' + convertToFilename(deckName) + '_back.png');
+            exportAndUpload(item_back, 'var/tts/item_' + convertToFilename(deckName) + '_back.png')
         }
 
         // generate initiative cards
@@ -591,11 +603,11 @@ async function main() {
             init_cards.push(card);
         }
         let init_sheet = new Cardistry.Sheet(init_cards);
-        init_sheet.exportScaledPNG('var/tts/initiative_fronts.png', 3, 1, true, false);
+        exportScaledAndUpload(init_sheet, 'var/tts/initiative_fronts.png', 3, 1, true, false);
         init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 3, 1, true, true);
         let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, COLORS.white, true);
         init_back.draw();
-        init_back.exportPNG('var/tts/initiative_back.png');
+        exportAndUpload(init_back, 'var/tts/initiative_back.png');
 
         // generate AI cards
         for(let deckName in ais) {
@@ -617,11 +629,11 @@ async function main() {
                 }
             }
             let ai_sheet = new Cardistry.Sheet(ai_cards);
-            ai_sheet.exportScaledPNG('var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
+            exportScaledAndUpload(ai_sheet, 'var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
-            let item_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS.gray, COLORS.black);
-            item_back.draw();
-            item_back.exportPNG('var/tts/ai_' + convertToFilename(deckName) + '_back.png');
+            let ai_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS.gray, COLORS.black);
+            ai_back.draw();
+            exportAndUpload(ai_back, 'var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
 
         // TODO: generate tokens
