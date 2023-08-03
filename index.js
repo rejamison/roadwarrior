@@ -653,6 +653,8 @@ async function main() {
             canvas.createPNGStream().pipe(out);
             upload(ASSET_FOLDER_ID, 'var/tts/' + token['Tag'] + ".png", auth);
         }
+
+        // TODO: Scenario cards
     });
 }
 main();
