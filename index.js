@@ -605,6 +605,7 @@ async function main() {
             item_back.exportPNG('var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
 
+        // TODO: generate tokens
         // TODO: upload sheets to google drive
     });
 }
