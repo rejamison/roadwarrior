@@ -516,7 +516,17 @@ async function main() {
                 keysToInvertedImages(die['Face 5'], COLORS[die['Color']]),
                 keysToInvertedImages(die['Face 6'], COLORS[die['Color']])
             ]);
-            rwd.exportPNG('var/tts/' + die['Tag'] + ".png", 3);
+            rwd.exportPNG('tmp/' + die['Tag'] + ".png", 3).then(() => {
+                loadImage('tmp/' + die['Tag'] + ".png").then((img) => {
+                    const canvas = cvs.createCanvas(img.width, img.height * 1.5);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#' + COLORS[die['Color']];
+                    ctx.fillRect(0, 0, img.width, img.height * 1.5);
+                    ctx.drawImage(img, 0, img.height * 0.5);
+                    const out = fs.createWriteStream('var/tts/' + die['Tag'] + ".png");
+                    canvas.createPNGStream().pipe(out);
+                });
+            });
         }
 
         // generate items

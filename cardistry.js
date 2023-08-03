@@ -614,9 +614,14 @@ class Sheet {
                 i++;
             });
 
-            const out = fs.createWriteStream(file);
-            sheetCanvas.createPNGStream().pipe(out);
-            out.on('finish', () => { console.log('exported sheet PNG: ' + file) });
+            return new Promise(resolve => {
+                const out = fs.createWriteStream(file);
+                sheetCanvas.createPNGStream().pipe(out);
+                out.on('finish', () => {
+                    console.log('exported sheet PNG: ' + file);
+                    resolve();
+                });
+            });
         }
     }
 
