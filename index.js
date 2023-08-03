@@ -20,8 +20,14 @@ const COLORS = {
     'gray': 'D3D3D3',
     'pink': 'FFC0CB',
     'light_gray': 'E8E8E8',
-    'light_grey': 'E8E8E8'
+    'light_grey': 'E8E8E8',
+    'white': 'FFFFFF'
 };
+const FONTS = {
+    'rokkitt': 'Rokkitt',
+    'rokkitt_bold': 'Rokkitt Bold',
+    'rokkitt_light': 'Rokkitt Light'
+}
 
 // setup the randomizer
 rnd.seed(Date.now().toString());
@@ -29,8 +35,8 @@ rnd.seed(Date.now().toString());
 console.log('initializing with seed ' + rnd.getSeedString());
 
 // register fonts
-cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: 'Rokkitt Bold'});
-cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: 'Rokkitt Light'});
+cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: FONTS.rokkitt_bold});
+cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONTS.rokkitt_light});
 
 // load images
 const im = new ImageManager();
@@ -46,7 +52,7 @@ const CARD_SAFE = 0.125;
 const CARD_HEIGHT = 2.48 + CARD_BLEED * 2;
 const CARD_WIDTH = 1.61 + CARD_BLEED * 2;
 const CARD_EXTRA = 0.05;
-const DEFAULT_CARD_BG_COLOR = 'FFFFFF';
+const DEFAULT_CARD_BG_COLOR = COLORS.white;
 const DEFAULT_TEXT_SIZE = (CARD_HEIGHT - 0.6) / 10.5;
 const DEFAULT_TEXT_MARGIN = DEFAULT_TEXT_SIZE * 0.23;
 const DEFAULT_DPI = 300;
@@ -65,7 +71,7 @@ function keysToInvertedImages(str, bgColor) {
     if(str.trim().length == 0) {
         return [];
     } else {
-        return str.split(/[ ,]+/).map(tag => im.getInverted(tag, 'FFFFFF', '000000', bgColor));
+        return str.split(/[ ,]+/).map(tag => im.getInverted(tag, COLORS.white, COLORS.black, bgColor));
     }
 }
 
@@ -154,19 +160,20 @@ function decksByFields(deck, field1, field2) {
 }
 
 class RoadWarriorCardBack extends Cardistry.Card {
-    constructor(deckName, icon, bgColor, isLandscape) {
+    constructor(deckName, iconImage, bgColor, textColor, isLandscape) {
         super(isLandscape ? CARD_HEIGHT : CARD_WIDTH, isLandscape ? CARD_WIDTH : CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, bgColor, DEFAULT_DPI);
 
         this.deckName = deckName;
-        this.deckImage = im.get(icon);
+        this.deckImage = iconImage;
+        this.textColor = textColor;
 
         if(this.deckImage) {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                'Rokkitt Bold',
-                '000000',
-                DEFAULT_TEXT_SIZE * 2,
+                FONTS.rokkitt_bold,
+                this.textColor,
+                DEFAULT_TEXT_SIZE,
                 0,
                 'center',
                 'middle',
@@ -183,9 +190,9 @@ class RoadWarriorCardBack extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                'Rokkitt Bold',
-                '000000',
-                DEFAULT_TEXT_SIZE * 2,
+                FONTS.rokkitt_bold,
+                this.textColor,
+                DEFAULT_TEXT_SIZE * 1.75,
                 0,
                 'center',
                 'middle',
@@ -216,8 +223,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            'Rokkitt Bold',
-            '000000',
+            FONTS.rokkitt_bold,
+            COLORS.black,
             DEFAULT_TEXT_SIZE * 0.75,
             0,
             'left',
@@ -241,8 +248,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackEffectText,
-                'Rokkitt',
-                '000000',
+                FONTS.rokkitt,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 0.6,
                 0,
                 'left',
@@ -253,8 +260,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackRange,
-                'Rokkitt Bold',
-                '000000',
+                FONTS.rokkitt_bold,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 0.5,
                 0,
                 'center',
@@ -267,8 +274,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.body,
-                'Rokkitt',
-                '000000',
+                FONTS.rokkitt,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 0.7,
                 0,
                 'left',
@@ -300,8 +307,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                'Rokkitt Bold',
-                '000000',
+                FONTS.rokkitt_bold,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 0.75,
                 0,
                 'center',
@@ -314,11 +321,12 @@ class RoadWarriorItemCard extends Cardistry.Card {
 }
 
 class RoadWarriorAICard extends Cardistry.Card {
-    constructor(faction, vehicle, title, arc, body, chain) {
+    constructor(faction, vehicle, vehicleIcon, title, arc, body, chain) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.faction = faction;
         this.vehicle = vehicle;
+        this.vehicleIconImage = im.get(vehicleIcon);
         this.title = title;
         this.attackArcImage = renderArc(arc);
         this.body = body;
@@ -328,8 +336,8 @@ class RoadWarriorAICard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            'Rokkitt Bold',
-            '000000',
+            FONTS.rokkitt_bold,
+            COLORS.black,
             DEFAULT_TEXT_SIZE * 0.75,
             0,
             'left',
@@ -346,8 +354,8 @@ class RoadWarriorAICard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.body,
-            'Rokkitt',
-            '000000',
+            FONTS.rokkitt,
+            COLORS.black,
             DEFAULT_TEXT_SIZE * 0.65,
             0,
             'left',
@@ -364,15 +372,25 @@ class RoadWarriorAICard extends Cardistry.Card {
                 false
             ));
         }
+        if(this.vehicleIconImage) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0, 0.9),
+                this.bgColor,
+                this.vehicleIconImage,
+                false
+            ));
+        }
     }
 }
 
 class RoadWarriorInitiativeCard extends Cardistry.Card {
-    constructor(faction, name, hp, color, toughness, quantity) {
+    constructor(faction, name, vehicleIcon, hp, color, toughness, quantity) {
         super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.faction = faction;
         this.name = name;
+        this.vehicleIconImage = im.get(vehicleIcon);
         this.hp = someOrNone(hp);
         this.color = someOrNone(color);
         this.toughness = someOrNone(toughness);
@@ -381,8 +399,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.faction + '\n' + this.name,
-            'Rokkitt Bold',
-            '000000',
+            FONTS.rokkitt_bold,
+            COLORS.black,
             DEFAULT_TEXT_SIZE * 1.2,
             0,
             'center',
@@ -393,8 +411,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.toughness,
-                'Rokkitt Bold',
-                '000000',
+                FONTS.rokkitt_bold,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 1.1,
                 0,
                 'center',
@@ -407,8 +425,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.quantity + 'X',
-                'Rokkitt Bold',
-                '000000',
+                FONTS.rokkitt_bold,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 1.1,
                 0,
                 'center',
@@ -435,8 +453,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                'Rokkitt Bold',
-                '000000',
+                FONTS.rokkitt_bold,
+                COLORS.black,
                 DEFAULT_TEXT_SIZE * 1.1,
                 0,
                 'center',
@@ -452,7 +470,7 @@ class RoadWarriorDie extends Cardistry.Sheet {
     constructor(bgColor, faces) {
         let cards = [];
         for(const face of faces) {
-            let die = new Cardistry.DieFace(D6_WIDTH, D6_HEIGHT, 0, 0, 0, bgColor, 300, face);
+            let die = new Cardistry.DieFace(D6_WIDTH, D6_HEIGHT, 0.05, 0, 0, bgColor, 300, face);
             die.draw();
             cards.push(die);
         }
@@ -474,7 +492,6 @@ async function loadSheet() {
         for(const row of symbols_response.data.values.slice(1)) {
             if(row[1] && row[1].endsWith('view?usp=drive_link')) {
                 const id = row[1].replace(/https:\/\/drive\.google\.com\/file\/d\/(.*?)\/.*?\?usp=drive_link/g, "$1");
-                // TODO: use tmp as cache
                 const file = await download(id, auth);
                 im.loadImage(row[0], file);
             } else {
@@ -553,7 +570,7 @@ async function main() {
             let item_sheet = new Cardistry.Sheet(item_cards);
             item_sheet.exportScaledPNG('var/tts/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             item_sheet.exportScaledPNG('var/pnp/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
-            let item_back = new RoadWarriorCardBack(deckName + ' Items', null, COLORS.blue);
+            let item_back = new RoadWarriorCardBack(deckName + ' Items', null, COLORS.blue, COLORS.white);
             item_back.draw();
             item_back.exportPNG('var/tts/item_' + convertToFilename(deckName) + '_back.png');
         }
@@ -564,6 +581,7 @@ async function main() {
             let card = new RoadWarriorInitiativeCard(
                 vehicle['Faction'],
                 vehicle['Name Text'],
+                vehicle['Vehicle Icon'],
                 vehicle['HP'],
                 vehicle['Color'],
                 vehicle['Tough.'],
@@ -575,7 +593,7 @@ async function main() {
         let init_sheet = new Cardistry.Sheet(init_cards);
         init_sheet.exportScaledPNG('var/tts/initiative_fronts.png', 3, 1, true, false);
         init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 3, 1, true, true);
-        let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, true);
+        let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, COLORS.white, true);
         init_back.draw();
         init_back.exportPNG('var/tts/initiative_back.png');
 
@@ -587,6 +605,7 @@ async function main() {
                 let card = new RoadWarriorAICard(
                     ai['Faction'],
                     ai['Vehicle'],
+                    ai['Vehicle Icon'],
                     ai['Name Text'],
                     ai['Arc'],
                     ai['Body Text'],
@@ -600,7 +619,7 @@ async function main() {
             let ai_sheet = new Cardistry.Sheet(ai_cards);
             ai_sheet.exportScaledPNG('var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
-            let item_back = new RoadWarriorCardBack(deckName + ' AI', null, COLORS.gray);
+            let item_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS.gray, COLORS.black);
             item_back.draw();
             item_back.exportPNG('var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
