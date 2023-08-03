@@ -484,6 +484,7 @@ let dice = {};
 let items = {};
 let vehicles = {};
 let ais = {};
+let tokens = {};
 let auth = null;
 async function exportAndUpload(sheet, path) {
     sheet.exportPNG(path).then((path) => {
@@ -526,6 +527,10 @@ async function loadSheet() {
         // load all the ais
         const ais_response = await getSheetValues(SHEET_ID, 'Enemy AI', auth);
         ais = decksByFields(rowsToObjects(ais_response.data.values), 'Faction', 'Vehicle');
+
+        // load all the tokens
+        const tokens_response = await getSheetValues(SHEET_ID, 'Tokens', auth);
+        tokens = rowsToObjects(tokens_response.data.values);
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -636,8 +641,18 @@ async function main() {
             exportAndUpload(ai_back, 'var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
 
-        // TODO: generate tokens
-        // TODO: upload sheets to google drive
+        // generate tokens
+        for(let token of Object.values(tokens)) {
+            let tokenImage = im.get(token['Icon']);
+            const canvas = cvs.createCanvas(tokenImage.width, tokenImage.height);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#' + COLORS.white;
+            ctx.fillRect(0, 0, tokenImage.width, tokenImage.height);
+            ctx.drawImage(tokenImage, 0, 0);
+            const out = fs.createWriteStream('var/tts/' + token['Tag'] + ".png");
+            canvas.createPNGStream().pipe(out);
+            upload(ASSET_FOLDER_ID, 'var/tts/' + token['Tag'] + ".png", auth);
+        }
     });
 }
 main();

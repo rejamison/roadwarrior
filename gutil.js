@@ -96,13 +96,8 @@ async function upload(folderId, path, auth) {
             console.log("Uploaded: " + path);
             return Promise.resolve(res.data.id);
         } else {
-            console.log(JSON.stringify(resList.data.files, null, 2));
             const res = await drive.files.update({
                 fileId: resList.data.files[0].id,
-                resource: {
-                    name: name,
-                    parents: [folderId]
-                },
                 media: {
                     mimeType: 'image/png',
                     body: fs.createReadStream(path)
