@@ -6,31 +6,51 @@ const fs = require('fs');
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'];
 
+/**
+ *
+ * @returns {Promise<JWT|Object>}
+ */
 async function getAuthToken() {
     const auth = new google.auth.GoogleAuth({
         scopes: SCOPES
     });
-    const authToken = await auth.fromJSON(keys);
-    return authToken;
+    return auth.fromJSON(keys);
 }
 
+/**
+ *
+ * @param {string} spreadsheetId
+ * @param {JWT} auth
+ * @returns {Promise<Object>}
+ */
 async function getSheet(spreadsheetId, auth) {
-    const res = await sheets.spreadsheets.get({
+    return await sheets.spreadsheets.get({
         spreadsheetId,
         auth,
     });
-    return res;
 }
 
+/**
+ *
+ * @param {string} spreadsheetId
+ * @param {string} sheetName
+ * @param {JWT} auth
+ * @returns {Promise<Object>}
+ */
 async function getSheetValues(spreadsheetId, sheetName, auth) {
-    const res = await sheets.spreadsheets.values.get({
+    return await sheets.spreadsheets.values.get({
         spreadsheetId,
         auth,
         range: sheetName
     });
-    return res;
 }
 
+/**
+ *
+ * @param {string} id
+ * @param {JWT} auth
+ * @returns {Promise<string>}
+ */
 async function download(id, auth) {
     try {
         const res = await drive.files.get({fileId : id, auth: auth, fields: 'name, modifiedTime, size'});
@@ -47,7 +67,7 @@ async function download(id, auth) {
             localSize = localStats.size;
         }
 
-        if(cloudTime > localTime || cloudSize != localSize) {
+        if(cloudTime > localTime || cloudSize !== localSize) {
             const f = fs.createWriteStream(path);
             const res2 = await drive.files.get({fileId: id, alt: 'media', auth: auth}, {responseType: 'stream'});
             return await new Promise((resolve, reject) => {
@@ -80,7 +100,7 @@ async function upload(folderId, path, auth) {
             auth: auth
         });
 
-        if(resList.data.files.length == 0) {
+        if(resList.data.files.length === 0) {
             const res = await drive.files.create({
                 resource: {
                     name: name,
