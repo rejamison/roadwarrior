@@ -469,19 +469,19 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
 
 class RoadWarriorScenarioCard extends Cardistry.Card {
     constructor(faction, name, playerPos, enemies, rewards, tier) {
-        super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
+        super(CARD_HEIGHT * 2, CARD_WIDTH * 2, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.factionText = faction;
         this.nameText = name;
-        this.playerPosX = playerPos.split(',')[0];
-        this.playerPosY = playerPos.split(',')[1];
+        this.playerPosX = playerPos.split(',')[0] - 1;
+        this.playerPosY = playerPos.split(',')[1] - 1;
         this.enemies = enemies.split('\n').map((value) => {
             const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
             const result = re.exec(value);
             let enemy = {
                 tag: result[1],
-                x: result[2],
-                y: result[3]
+                x: result[2] - 1,
+                y: result[3] - 1
             };
 
             if(vehicles[enemy.tag]) {
@@ -498,18 +498,18 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         this.addElement(new Cardistry.ImageBox(
             this,
             mapRect,
-            this.bgColor,
+            null,
             im.get('map'),
             false
         ));
-        let h = mapRect.h / 10;
-        let w = mapRect.w / 15;
-        let fx = 0;
-        let fy = 0;
+        const fudgeRect = mapRect.cut(13, 6, 65, 67);
+        let h = fudgeRect.h / 10;
+        let w = fudgeRect.w / 14;
+//        this.addElement(new Cardistry.Box(this, fudgeRect, COLORS.red));
         for(let enemy of this.enemies) {
             let vehicle = vehicles[enemy.tag];
-            let x = enemy.x * w + mapRect.x;
-            let y = enemy.y * h + mapRect.y;
+            let x = enemy.x * w + fudgeRect.x + (((enemy.y + 1) % 2) * (w / 2));
+            let y = enemy.y * h + fudgeRect.y;
             this.addElement(new Cardistry.ImageBox(
                 this,
                 new BoundaryRect(x, y, h, w).shrinkPct(0.1),
@@ -520,7 +520,7 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         }
         this.addElement(new Cardistry.ImageBox(
             this,
-            new BoundaryRect(this.playerPosX * w + mapRect.x, this.playerPosY * h + mapRect.y, w, h).shrinkPct(0.1),
+            new BoundaryRect(this.playerPosX * w + fudgeRect.x + (((this.playerPosY + 1) % 2) * (w / 2)), this.playerPosY * h + fudgeRect.y, w, h).shrinkPct(0.1),
             null,
             im.get('special'),
             false
@@ -530,7 +530,7 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
             this.factionText + ' ' + this.nameText,
             FONTS.rokkitt_bold,
             COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.5,
+            DEFAULT_TEXT_SIZE,
             0,
             'left',
             'bottom',
@@ -542,7 +542,7 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
             'Rewards:\n' + this.rewardText,
             FONTS.rokkitt_bold,
             COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.4,
+            DEFAULT_TEXT_SIZE * 0.8,
             0,
             'right',
             'bottom',
@@ -761,8 +761,8 @@ async function main() {
                 scenario_cards.push(card);
             }
             let scenario_sheet = new Cardistry.Sheet(scenario_cards);
-            exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
-            scenario_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
+            exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, false);
+            scenario_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, true);
             let scenario_back = new RoadWarriorCardBack(deckName + ' Scenario', null, COLORS.black, COLORS.white, true);
             scenario_back.draw();
             exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
