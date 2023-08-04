@@ -527,7 +527,7 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         ));
         this.addElement(new Cardistry.TextBox(
             this,
-            this.factionText + ' ' + this.nameText,
+            this.factionText + '\n' + this.nameText,
             FONTS.rokkitt_bold,
             COLORS.black,
             DEFAULT_TEXT_SIZE,
