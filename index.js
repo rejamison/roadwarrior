@@ -467,6 +467,91 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
     }
 }
 
+class RoadWarriorScenarioCard extends Cardistry.Card {
+    constructor(faction, name, playerPos, enemies, rewards, tier) {
+        super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
+
+        this.factionText = faction;
+        this.nameText = name;
+        this.playerPosX = playerPos.split(',')[0];
+        this.playerPosY = playerPos.split(',')[1];
+        this.enemies = enemies.split('\n').map((value) => {
+            const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
+            const result = re.exec(value);
+            let enemy = {
+                tag: result[1],
+                x: result[2],
+                y: result[3]
+            };
+
+            if(vehicles[enemy.tag]) {
+                return enemy;
+            } else {
+                console.error("ERROR: Bad tag in scenario: " + enemy.tag);
+            }
+        });
+        this.rewardText = rewards;
+        this.tierText = tier;
+
+
+        const mapRect = this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.1);
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            mapRect,
+            this.bgColor,
+            im.get('map'),
+            false
+        ));
+        let h = mapRect.h / 10;
+        let w = mapRect.w / 15;
+        let fx = 0;
+        let fy = 0;
+        for(let enemy of this.enemies) {
+            let vehicle = vehicles[enemy.tag];
+            let x = enemy.x * w + mapRect.x;
+            let y = enemy.y * h + mapRect.y;
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                new BoundaryRect(x, y, h, w).shrinkPct(0.1),
+                null,
+                im.getRecolored(vehicle['Vehicle Icon'], COLORS[vehicle['Color']]),
+                false
+            ));
+        }
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            new BoundaryRect(this.playerPosX * w + mapRect.x, this.playerPosY * h + mapRect.y, w, h).shrinkPct(0.1),
+            null,
+            im.get('special'),
+            false
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.factionText + ' ' + this.nameText,
+            FONTS.rokkitt_bold,
+            COLORS.black,
+            DEFAULT_TEXT_SIZE * 0.5,
+            0,
+            'left',
+            'bottom',
+            this.getDrawableBoundRect().cutPct(0, 0, 0.9, 0),
+            this.bgColor
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            'Rewards:\n' + this.rewardText,
+            FONTS.rokkitt_bold,
+            COLORS.black,
+            DEFAULT_TEXT_SIZE * 0.4,
+            0,
+            'right',
+            'bottom',
+            this.getDrawableBoundRect().cutPct(0.8, 0, 0.5, 0),
+            this.bgColor
+        ));
+    }
+}
+
 class RoadWarriorDie extends Cardistry.Sheet {
     constructor(bgColor, faces) {
         let cards = [];
@@ -485,6 +570,7 @@ let items = {};
 let vehicles = {};
 let ais = {};
 let tokens = {};
+let scenarios = {};
 let auth = null;
 async function exportAndUpload(sheet, path) {
     sheet.exportPNG(path).then((path) => {
@@ -531,6 +617,10 @@ async function loadSheet() {
         // load all the tokens
         const tokens_response = await getSheetValues(SHEET_ID, 'Tokens', auth);
         tokens = rowsToObjects(tokens_response.data.values);
+
+        // load all the scenarios
+        const scenarios_response = await getSheetValues(SHEET_ID, 'Scenarios', auth);
+        scenarios = decksByFields(rowsToObjects(scenarios_response.data.values), 'Tier');
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -627,7 +717,7 @@ async function main() {
                     ai['Arc'],
                     ai['Body Text'],
                     ai['Chain?']
-                )
+                );
                 card.draw();
                 for (let i = 0; i < ai['Qty']; i++) {
                     ai_cards.push(card);
@@ -654,6 +744,29 @@ async function main() {
             upload(ASSET_FOLDER_ID, 'var/tts/' + token['Tag'] + ".png", auth);
         }
 
+        // generate scenarios
+        for(let deckName in scenarios) {
+            let deck = scenarios[deckName];
+            let scenario_cards = [];
+            for(let scenario of Object.values(deck)) {
+                let card = new RoadWarriorScenarioCard(
+                    scenario['Faction'],
+                    scenario['Name Text'],
+                    scenario['Player Pos'],
+                    scenario['Enemies'],
+                    scenario['Rewards'],
+                    scenario['Tier']
+                );
+                card.draw();
+                scenario_cards.push(card);
+            }
+            let scenario_sheet = new Cardistry.Sheet(scenario_cards);
+            exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
+            scenario_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
+            let scenario_back = new RoadWarriorCardBack(deckName + ' Scenario', null, COLORS.black, COLORS.white, true);
+            scenario_back.draw();
+            exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
+        }
         // TODO: Scenario cards
     });
 }

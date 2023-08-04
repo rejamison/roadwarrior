@@ -41,6 +41,10 @@ class BoundaryRect {
         return new BoundaryRect(this.x + margin, this.y + margin, this.w - margin * 2, this.h - margin * 2);
     }
 
+    shrinkPct(pct) {
+        return this.shrink(this.w * pct);
+    }
+
     expand(margin) {
         return new BoundaryRect(this.x - margin, this.y - margin, this.w + margin * 2, this.h + margin * 2);
     }
@@ -247,8 +251,10 @@ class ImageBox extends Box {
     draw() {
         this.ctx.save();
 
-        this.ctx.fillStyle = '#' + this.color;
-        this.ctx.fillRect(this.boundRect.x, this.boundRect.y, this.boundRect.w, this.boundRect.h);
+        if(this.color) {
+            this.ctx.fillStyle = '#' + this.color;
+            this.ctx.fillRect(this.boundRect.x, this.boundRect.y, this.boundRect.w, this.boundRect.h);
+        }
         if(this.stretch) {
             this.ctx.drawImage(this.image, this.boundRect.x, this.boundRect.y, this.boundRect.w, this.boundRect.h);
         } else {
