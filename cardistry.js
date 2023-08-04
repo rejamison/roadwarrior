@@ -3,6 +3,20 @@ const fs = require("fs");
 const rnd = require("./randomizer");
 const {createCanvas, loadImage} = require("canvas");
 
+const V_ALIGN = {
+    top: 'top',
+    bottom: 'bottom',
+    middle: 'middle'
+}
+exports.V_ALIGN = V_ALIGN;
+
+const H_ALIGN = {
+    left: 'left',
+    right: 'right',
+    center: 'center'
+}
+exports.H_ALIGN = H_ALIGN;
+
 class BoundaryRect {
     constructor(x, y, w, h) {
         this.x = x;
@@ -113,7 +127,6 @@ class Card {
     /** @type {string} */
     bgColor
     dpi
-    elements
 
     constructor(width, height, bleed, safe, extra, bgColor, dpi) {
         this.height = height;
@@ -144,6 +157,7 @@ class Card {
     }
 
     addElement(element) {
+        element.parent = this;
         this.elements.push(element);
     }
 
@@ -221,14 +235,16 @@ class Card {
 exports.Card = Card;
 
 class CardElement {
+    /** @type Card */
+    parent
+
     constructor(parent, boundRect) {
         this.parent = parent;
-
         if(!boundRect) {
-            boundRect = parent.getDrawableBoundRect();
+            this.boundRect = parent.getDrawableBoundRect();
+        } else {
+            this.boundRect = boundRect;
         }
-
-        this.boundRect = boundRect;
     }
 
     draw() { }
@@ -254,13 +270,19 @@ class Box extends CardElement {
 }
 exports.Box = Box;
 
-// TODO:  Allow for horizontal or vertical alignment.
 class ImageBox extends Box {
-    constructor(parent, boundRect, bgColor, image, stretch) {
+    image
+    stretch
+    hAlign
+    vAlign
+
+    constructor(parent, boundRect, bgColor, image, stretch, hAlign, vAlign) {
         super(parent, boundRect, bgColor);
 
         this.image = image;
         this.stretch = stretch;
+        this.hAlign = hAlign;
+        this.vAlign = vAlign;
     }
 
     draw() {
@@ -279,8 +301,21 @@ class ImageBox extends Box {
             }
             let w = this.image.width * factor;
             let h = this.image.height * factor;
-            let x = this.boundRect.x + ((this.boundRect.w - w) / 2);
-            let y = this.boundRect.y + ((this.boundRect.h - h) / 2);
+            let x, y;
+            if(this.hAlign === H_ALIGN.left) {
+                x = this.boundRect.x;
+            } else if(this.hAlign === H_ALIGN.right) {
+                x = this.boundRect.x + (this.boundRect.w - w);
+            } else {
+                x = this.boundRect.x + ((this.boundRect.w - w) / 2)
+            }
+            if(this.vAlign === V_ALIGN.top) {
+                y = this.boundRect.y;
+            } else if(this.vAlign === V_ALIGN.bottom) {
+                y = this.boundRect.y + (this.boundRect.h - h);
+            } else {
+               y = this.boundRect.y + ((this.boundRect.h - h) / 2);
+            }
 
             this.ctx.drawImage(this.image, x, y, w, h);
         }
@@ -390,22 +425,22 @@ class TextBox extends CardElement {
         // draw the text
         this.ctx.fillStyle = '#' + this.color;
         let x, y;
-        if(this.baseline === 'middle') {
+        if(this.baseline === V_ALIGN.middle) {
             y = this.boundRect.y + (this.boundRect.h / 2) - (this.hpx / 2) + this.marginPx;
-        } else if(this.baseline === 'top') {
+        } else if(this.baseline === V_ALIGN.top) {
             y = this.boundRect.y + this.marginPx;
-        } else if(this.baseline === 'bottom') {
+        } else if(this.baseline === V_ALIGN.bottom) {
             y = this.boundRect.y + this.boundRect.h - this.hpx + this.marginPx;
         } else {
             console.log("WARNING: UNRECOGNIZED BASELINE VALUE: " + this.baseline);
             y = this.boundRect.y + this.marginPx;
         }
         this.lines.forEach(line => {
-            if(this.align === 'left') {
+            if(this.align === H_ALIGN.left) {
                 x = this.boundRect.x + this.marginPx;
-            } else if(this.align === 'right') {
+            } else if(this.align === H_ALIGN.right) {
                 x = this.boundRect.x + this.boundRect.w - this.marginPx - line.width;
-            } else if(this.align === 'center') {
+            } else if(this.align === H_ALIGN.center) {
                 x = this.boundRect.x + (this.boundRect.w / 2) - (line.width / 2);
             } else {
                 console.log("WARNING: UNRECOGNIZED ALIGN VALUE: " + this.align);
@@ -429,16 +464,16 @@ class TextBox extends CardElement {
 
     getTextBoundRect() {
         let x, y;
-        if(this.align === 'center') {
+        if(this.align === H_ALIGN.center) {
             x = this.boundRect.x + this.boundRect.w / 2 - this.wpx / 2;
-        } else if(this.align === 'right') {
+        } else if(this.align === H_ALIGN.right) {
             x = this.boundRect.x + this.boundRect.w - this.wpx;
         } else {
             x = this.boundRect.x;
         }
-        if(this.baseline === 'middle') {
+        if(this.baseline === V_ALIGN.middle) {
             y = this.boundRect.y + this.boundRect.h / 2 - this.hpx / 2;
-        } else if(this.baseline === 'top' || this.baseline === 'hanging') {
+        } else if(this.baseline === V_ALIGN.top || this.baseline === 'hanging') {
             y = this.boundRect.y;
         } else {
             y = this.boundRect.y + this.boundRect.h - this.hpx;
@@ -556,12 +591,12 @@ class GridCard extends Card {
         b.x -= lSpill;
         b.w += lSpill;
         let rSpill = ((b.w) % this.cwpx);
-        b.w += rSpill == 0 ? 0 : this.cwpx - rSpill;
+        b.w += rSpill === 0 ? 0 : this.cwpx - rSpill;
         let tSpill = (b.y - this.mpx - this.cheatY) % this.cwpx;
         b.y -= tSpill;
         b.h += tSpill;
         let bSpill = ((b.h) % this.cwpx);
-        b.h += bSpill == 0 ? 0 : this.cwpx - bSpill;
+        b.h += bSpill === 0 ? 0 : this.cwpx - bSpill;
 
         // draw the box
         this.ctx.fillStyle = '#' + this.bgColor;
@@ -591,25 +626,25 @@ class DieFace extends Card {
         this.icons = icons;
 
         if(this.icons.length === 1) {
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect(), this.bgColor, icons[0], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect(), this.bgColor, icons[0]));
         } else if(this.icons.length === 2) {
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[1], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[1]));
         } else if(this.icons.length === 3) {
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.25, 0.25, 0.5, 0), this.bgColor, icons[2], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.25, 0.25, 0.5, 0), this.bgColor, icons[2]));
         } else if(this.icons.length === 4) {
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0.5, 0), this.bgColor, icons[2], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[3], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0.5, 0), this.bgColor, icons[2]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[3]));
         } else if(this.icons.length === 5) {
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0, 0.66), this.bgColor, icons[0], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0, 0.66), this.bgColor, icons[1], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0.66, 0), this.bgColor, icons[2], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0.66, 0), this.bgColor, icons[3], false));
-            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.33, 0.33, 0.33, 0.33), this.bgColor, icons[4], false));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0, 0.66), this.bgColor, icons[0]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0, 0.66), this.bgColor, icons[1]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0.66, 0), this.bgColor, icons[2]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0.66, 0), this.bgColor, icons[3]));
+            this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.33, 0.33, 0.33, 0.33), this.bgColor, icons[4]));
         } else {
             // do nothing
         }

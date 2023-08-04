@@ -148,8 +148,11 @@ function rowsToObjects(rows) {
  * @param {Canvas|Image[]} images
  * @param {BoundaryRect} boundaryRect
  * @param {string} [bgColor]
+ * @param {boolean} [stretch]
+ * @param {string} [vAlign]
+ * @param {string} [hAlign]
  */
-function addImagesRow(parent, images, boundaryRect, bgColor) {
+function addImagesRow(parent, images, boundaryRect, bgColor, stretch, hAlign, vAlign) {
     if(images && images.length > 0) {
         for(let i = 0; i < images.length; i++) {
             let image = images[i];
@@ -159,7 +162,9 @@ function addImagesRow(parent, images, boundaryRect, bgColor) {
                     boundaryRect.cutPct((1 / images.length) * i, (1 / images.length) * (images.length - i - 1), 0, 0),
                     bgColor ? bgColor : parent.bgColor,
                     image,
-                    false
+                    false,
+                    hAlign,
+                    vAlign
                 ));
             } else {
                 console.error('Missing image...');
@@ -301,7 +306,6 @@ class RoadWarriorItemCard extends Cardistry.Card {
             'top',
             this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
-
         if(this.attackCostImages.length > 0) {
             let attackBoxRect = this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.2);
             let attackBoxBgColor = COLORS['gray'];
@@ -340,7 +344,6 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 attackBoxBgColor
             ));
         } else {
-            // TODO: Support for inline symbols...
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.body,
@@ -360,11 +363,21 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 this.getDrawableBoundRect().cutPct(0.8, 0, 0, 0.9),
                 this.bgColor,
                 this.slotsImage,
-                false
+                false,
+                'right',
+                'top'
             ));
         }
         if(this.dice) {
-            addImagesRow(this, this.dice.map((x) => im.getRecolored('die', COLORS[x])), this.getDrawableBoundRect().cutPct(0, 0.5, 0.9, 0));
+            addImagesRow(
+                this,
+                this.dice.map((x) => im.getRecolored('die', COLORS[x])),
+                this.getDrawableBoundRect().cutPct(0, 0.5, 0.9, 0),
+                this.bgColor,
+                false,
+                'left',
+                'middle'
+            );
         }
         if(this.hp) {
             this.addElement(new Cardistry.ImageBox(
@@ -426,8 +439,7 @@ class RoadWarriorAICard extends Cardistry.Card {
             this,
             this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.55),
             this.bgColor,
-            this.attackArcImage,
-            false
+            this.attackArcImage
         ));
         this.addElement(new Cardistry.TextBox(
             this,
@@ -447,7 +459,9 @@ class RoadWarriorAICard extends Cardistry.Card {
                 this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
                 this.bgColor,
                 this.chainImage,
-                false
+                false,
+                'right',
+                'bottom'
             ));
         }
         if(this.vehicleIconImage) {
@@ -456,7 +470,9 @@ class RoadWarriorAICard extends Cardistry.Card {
                 this.getDrawableBoundRect().cutPct(0.8, 0, 0, 0.9),
                 this.bgColor,
                 this.vehicleIconImage,
-                false
+                false,
+                'right',
+                'top'
             ));
         }
     }

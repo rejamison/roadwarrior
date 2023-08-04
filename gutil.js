@@ -67,7 +67,7 @@ async function download(id, auth) {
             localSize = localStats.size;
         }
 
-        if(cloudTime > localTime || cloudSize !== localSize) {
+        if(cloudTime > localTime || parseInt(cloudSize) !== localSize) {
             const f = fs.createWriteStream(path);
             const res2 = await drive.files.get({fileId: id, alt: 'media', auth: auth}, {responseType: 'stream'});
             return await new Promise((resolve, reject) => {
