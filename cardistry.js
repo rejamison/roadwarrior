@@ -99,7 +99,22 @@ class BoundaryRect {
 }
 exports.BoundaryRect = BoundaryRect;
 
+/**
+ * @class Card
+ * @param {string} bgColor
+ */
 class Card {
+    height
+    width
+    bleed
+    safe
+    extra
+    margin
+    /** @type {string} */
+    bgColor
+    dpi
+    elements
+
     constructor(width, height, bleed, safe, extra, bgColor, dpi) {
         this.height = height;
         this.width = width;
@@ -323,7 +338,7 @@ class TextBox extends CardElement {
                 this.chunks.push(chunk);
             });
             this.chunks.forEach(chunk => {
-                if(this.lines[idx].chunks.length == 0) {
+                if(this.lines[idx].chunks.length === 0) {
                     this.lines[idx].chunks.push(chunk);
                     this.lines[idx].width += chunk.width;
                 } else {
@@ -575,21 +590,21 @@ class DieFace extends Card {
 
         this.icons = icons;
 
-        if(this.icons.length == 1) {
+        if(this.icons.length === 1) {
             this.addElement(new ImageBox(this, this.getDrawableBoundRect(), this.bgColor, icons[0], false));
-        } else if(this.icons.length == 2) {
+        } else if(this.icons.length === 2) {
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[1], false));
-        } else if(this.icons.length == 3) {
+        } else if(this.icons.length === 3) {
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.25, 0.25, 0.5, 0), this.bgColor, icons[2], false));
-        } else if(this.icons.length == 4) {
+        } else if(this.icons.length === 4) {
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0, 0.5), this.bgColor, icons[0], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0, 0.5), this.bgColor, icons[1], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.5, 0.5, 0), this.bgColor, icons[2], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.5, 0, 0.5, 0), this.bgColor, icons[3], false));
-        } else if(this.icons.length == 5) {
+        } else if(this.icons.length === 5) {
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0, 0.66), this.bgColor, icons[0], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0.66, 0, 0, 0.66), this.bgColor, icons[1], false));
             this.addElement(new ImageBox(this, this.getDrawableBoundRect().cutPct(0, 0.66, 0.66, 0), this.bgColor, icons[2], false));
@@ -646,8 +661,6 @@ class Sheet {
             let sy = 0;
             let sw = this.cards[0].wpx;
             let sh = this.cards[0].hpx;
-            let dx = 0;
-            let dy = 0;
             let dw = Math.round(cardWpx * pct);
             let dh = Math.round(cardHpx * pct);
 
@@ -761,6 +774,9 @@ class Showcase extends Sheet {
 exports.Showcase = Showcase;
 
 class ImageManager {
+    images
+    promises
+
     constructor() {
         this.images = new Map();
         this.promises = [];
@@ -769,7 +785,7 @@ class ImageManager {
     loadImage(key, file) {
         if(key && file) {
             let that = this;
-            this.promises.push(new Promise(function(resolve, reject) {
+            this.promises.push(new Promise(function(resolve) {
                 console.log("Registering image: " + key + "|" + file);
                 loadImage(file).then((img) => {
                     that.images.set(key, img);

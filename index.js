@@ -3,7 +3,7 @@ const fs = require("fs");
 const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
 const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager} = require("./cardistry");
-const {loadImage} = require("canvas");
+const {Canvas, loadImage} = require("canvas");
 const {getAuthToken, getSheet, getSheetValues, download, upload} = require('./gutil');
 
 const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
@@ -48,6 +48,7 @@ if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
 if(!fs.existsSync('var/tts')) fs.mkdirSync('var/tts');
 if(!fs.existsSync('var/pnp')) fs.mkdirSync('var/pnp');
 
+// constants
 const CARD_BLEED = 0.125;
 const CARD_SAFE = 0.125;
 const CARD_HEIGHT = 2.48 + CARD_BLEED * 2;
@@ -60,22 +61,47 @@ const DEFAULT_DPI = 300;
 const D6_WIDTH = 0.5;
 const D6_HEIGHT = 0.5;
 
+// globals
+let dice = {};
+let items = {};
+let vehicles = {};
+let ais = {};
+let tokens = {};
+let scenarios = {};
+let auth = null;
+
+/**
+ *
+ * @param {string} str
+ * @returns {Canvas[]|Image[]}
+ */
 function keysToImages(str) {
-    if(str.trim().length == 0) {
+    if(str.trim().length === 0) {
         return [];
     } else {
         return str.split(/[ ,]+/).map(tag => im.get(tag));
     }
 }
 
+/**
+ *
+ * @param {string} str
+ * @param {string} bgColor
+ * @returns {Canvas[]|Image[]}
+ */
 function keysToInvertedImages(str, bgColor) {
-    if(str.trim().length == 0) {
+    if(str.trim().length === 0) {
         return [];
     } else {
         return str.split(/[ ,]+/).map(tag => im.getInverted(tag, COLORS.white, COLORS.black, bgColor));
     }
 }
 
+/**
+ *
+ * @param {string} str
+ * @returns {Canvas|Image}
+ */
 function renderArc(str) {
     if(str && str.trim().length > 0) {
         if(str === 'any') {
@@ -95,6 +121,11 @@ function renderArc(str) {
     }
 }
 
+/**
+ *
+ * @param {Object[]} rows
+ * @returns {Object}
+ */
 function rowsToObjects(rows) {
     let objects = {};
     let col_names = [];
@@ -111,6 +142,13 @@ function rowsToObjects(rows) {
     return objects;
 }
 
+/**
+ *
+ * @param {Cardistry.Card} parent
+ * @param {Canvas|Image[]} images
+ * @param {BoundaryRect} boundaryRect
+ * @param {string} [bgColor]
+ */
 function addImagesRow(parent, images, boundaryRect, bgColor) {
     if(images && images.length > 0) {
         for(let i = 0; i < images.length; i++) {
@@ -130,20 +168,37 @@ function addImagesRow(parent, images, boundaryRect, bgColor) {
     }
 }
 
+/**
+ *
+ * @param {string} str
+ * @returns {string|null}
+ */
 function someOrNone(str) {
     if(!str) {
         return null;
-    } else if(str.trim().length == 0) {
+    } else if(str.trim().length === 0) {
         return null;
     } else {
         return str.trim();
     }
 }
 
+/**
+ *
+ * @param {string} str
+ * @returns {string}
+ */
 function convertToFilename(str) {
     return str.toLowerCase().replace(/[ -]+/g, '_');
 }
 
+/**
+ *
+ * @param {Object} deck
+ * @param {string} field1
+ * @param {string} [field2]
+ * @returns {Object}
+ */
 function decksByFields(deck, field1, field2) {
     let decks = {};
 
@@ -161,6 +216,10 @@ function decksByFields(deck, field1, field2) {
 }
 
 class RoadWarriorCardBack extends Cardistry.Card {
+    deckName
+    deckImage
+    textColor
+
     constructor(deckName, iconImage, bgColor, textColor, isLandscape) {
         super(isLandscape ? CARD_HEIGHT : CARD_WIDTH, isLandscape ? CARD_WIDTH : CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, bgColor, DEFAULT_DPI);
 
@@ -204,6 +263,16 @@ class RoadWarriorCardBack extends Cardistry.Card {
 }
 
 class RoadWarriorItemCard extends Cardistry.Card {
+    title
+    body
+    hp
+    dice
+    slotsImage
+    attackCostImages
+    attackEffectText
+    attackArcImage
+    attackRange
+
     constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
@@ -322,6 +391,14 @@ class RoadWarriorItemCard extends Cardistry.Card {
 }
 
 class RoadWarriorAICard extends Cardistry.Card {
+    faction
+    vehicle
+    vehicleIconImage
+    title
+    attackArcImage
+    body
+    chainImage
+
     constructor(faction, vehicle, vehicleIcon, title, arc, body, chain) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
@@ -386,6 +463,14 @@ class RoadWarriorAICard extends Cardistry.Card {
 }
 
 class RoadWarriorInitiativeCard extends Cardistry.Card {
+    faction
+    name
+    vehicleIconImage
+    hp
+    color
+    toughness
+    quantity
+
     constructor(faction, name, vehicleIcon, hp, color, toughness, quantity) {
         super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
@@ -468,6 +553,14 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
 }
 
 class RoadWarriorScenarioCard extends Cardistry.Card {
+    factionText
+    nameText
+    playerPosX
+    playerPosY
+    enemies
+    rewardText
+    tierText
+
     constructor(faction, name, playerPos, enemies, rewards, tier) {
         super(CARD_HEIGHT * 2, CARD_WIDTH * 2, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
@@ -565,23 +658,38 @@ class RoadWarriorDie extends Cardistry.Sheet {
     }
 }
 
-let dice = {};
-let items = {};
-let vehicles = {};
-let ais = {};
-let tokens = {};
-let scenarios = {};
-let auth = null;
+/**
+ *
+ * @param {Sheet|Card} sheet
+ * @param {string} path
+ * @returns {Promise<void>}
+ */
 async function exportAndUpload(sheet, path) {
     sheet.exportPNG(path).then((path) => {
         return upload(ASSET_FOLDER_ID, path, auth);
     });
 }
+
+/**
+ *
+ * @param {Sheet} sheet
+ * @param {string} path
+ * @param {number} columns
+ * @param {number} pct
+ * @param {boolean} excludePrintableArea
+ * @param {boolean} includeHashMarks
+ * @returns {Promise<void>}
+ */
 async function exportScaledAndUpload(sheet, path, columns, pct, excludePrintableArea, includeHashMarks) {
     sheet.exportScaledPNG(path, columns, pct, excludePrintableArea, includeHashMarks).then((path) => {
         return upload(ASSET_FOLDER_ID, path, auth);
     });
 }
+
+/**
+ *
+ * @returns {Promise<void>}
+ */
 async function loadSheet() {
     try {
         auth = await getAuthToken();
@@ -767,7 +875,6 @@ async function main() {
             scenario_back.draw();
             exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
         }
-        // TODO: Scenario cards
     });
 }
 main();
