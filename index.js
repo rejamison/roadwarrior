@@ -22,6 +22,8 @@ const COLORS = {
     'pink': 'FFC0CB',
     'light_gray': 'E8E8E8',
     'light_grey': 'E8E8E8',
+    'dark_grey': '888888',
+    'dark_gray': '888888',
     'white': 'FFFFFF'
 };
 const FONTS = {
@@ -850,7 +852,7 @@ async function main() {
             let ai_sheet = new Cardistry.Sheet(ai_cards);
             exportScaledAndUpload(ai_sheet, 'var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
-            let ai_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS.gray, COLORS.black);
+            let ai_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS[Object.values(deck)[0]['Back Color']], COLORS.black);
             ai_back.draw();
             exportAndUpload(ai_back, 'var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
@@ -887,7 +889,7 @@ async function main() {
             let scenario_sheet = new Cardistry.Sheet(scenario_cards);
             exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, false);
             scenario_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, true);
-            let scenario_back = new RoadWarriorCardBack(deckName + ' Scenario', null, COLORS.black, COLORS.white, true);
+            let scenario_back = new RoadWarriorCardBack(deckName + ' Scenario', null, COLORS.dark_gray, COLORS.white, true);
             scenario_back.draw();
             exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
         }
