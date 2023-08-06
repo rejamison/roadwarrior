@@ -70,6 +70,7 @@ let vehicles = {};
 let ais = {};
 let tokens = {};
 let scenarios = {};
+let rules = {};
 let auth = null;
 
 /**
@@ -266,6 +267,41 @@ class RoadWarriorCardBack extends Cardistry.Card {
                 this.getDrawableBoundRect(),
                 this.bgColor));
         }
+    }
+}
+
+class RoadWarriorRuleCard extends Cardistry.Card {
+    ruleName
+    ruleText
+
+    constructor(ruleName, ruleText) {
+        super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, COLORS.white, DEFAULT_DPI);
+
+        this.ruleName = ruleName;
+        this.ruleText = ruleText;
+
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.ruleName,
+            FONTS.rokkitt_bold,
+            this.textColor,
+            DEFAULT_TEXT_SIZE * 0.55,
+            0,
+            'left',
+            'top',
+            this.getDrawableBoundRect().cutPct(0, 0, 0, 0.9),
+            this.bgColor));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.ruleText,
+            FONTS.rokkitt,
+            this.textColor,
+            DEFAULT_TEXT_SIZE * 0.4,
+            0,
+            'left',
+            'top',
+            this.getDrawableBoundRect().cutPct(0, 0, 0.1, 0),
+            this.bgColor));
     }
 }
 
@@ -747,6 +783,10 @@ async function loadSheet() {
         // load all the scenarios
         const scenarios_response = await getSheetValues(SHEET_ID, 'Scenarios', auth);
         scenarios = decksByFields(rowsToObjects(scenarios_response.data.values), 'Tier');
+
+        // load all the rules
+        const rules_response = await getSheetValues(SHEET_ID, 'Rules', auth);
+        rules = rowsToObjects(rules_response.data.values);
     } catch(error) {
         console.log(error.message, error.stack);
     }
@@ -893,6 +933,20 @@ async function main() {
             scenario_back.draw();
             exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
         }
+
+        let rule_cards = [];
+        for(let ruleTag in rules) {
+            let rule = rules[ruleTag];
+            let card = new RoadWarriorRuleCard(rule['Name'], rule['Rules']);
+            card.draw();
+            rule_cards.push(card);
+        }
+        let rule_sheet = new Cardistry.Sheet(rule_cards);
+        exportScaledAndUpload(rule_sheet, 'var/tts/rule_fronts.png', 3, 1, true, false);
+        rule_sheet.exportScaledPNG('var/pnp/rule_fronts.png', 3, 1, true, true);
+        let rule_back = new RoadWarriorCardBack('Rule', im.get('book'), COLORS.pink, COLORS.black, true);
+        rule_back.draw();
+        exportAndUpload(rule_back, 'var/tts/rule_back.png');
     });
 }
 main();
