@@ -550,7 +550,7 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
         if(this.toughness) {
             this.addElement(new Cardistry.TextBox(
                 this,
-                this.toughness,
+                this.toughness + '+',
                 FONTS.rokkitt_bold,
                 COLORS.black,
                 DEFAULT_TEXT_SIZE * 1.1,
