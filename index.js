@@ -24,7 +24,10 @@ const COLORS = {
     'light_grey': 'E8E8E8',
     'dark_grey': '888888',
     'dark_gray': '888888',
-    'white': 'FFFFFF'
+    'white': 'FFFFFF',
+    'olive': 'AFB42B',
+    'brown': '795548',
+    'teal': '00ACC1'
 };
 const FONTS = {
     'rokkitt': 'Rokkitt',
@@ -197,7 +200,7 @@ function someOrNone(str) {
  * @returns {string}
  */
 function convertToFilename(str) {
-    return str.toLowerCase().replace(/[ -]+/g, '_');
+    return str.toLowerCase().replace(/[ .-]+/g, '_');
 }
 
 /**
