@@ -867,8 +867,8 @@ async function main() {
             init_cards.push(card);
         }
         let init_sheet = new Cardistry.Sheet(init_cards);
-        exportScaledAndUpload(init_sheet, 'var/tts/initiative_fronts.png', 3, 1, true, false);
-        init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 3, 1, true, true);
+        exportScaledAndUpload(init_sheet, 'var/tts/initiative_fronts.png', 5, 1, true, false);
+        init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 5, 1, true, true);
         let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, COLORS.white, true);
         init_back.draw();
         exportAndUpload(init_back, 'var/tts/initiative_back.png');
@@ -928,6 +928,9 @@ async function main() {
                 );
                 card.draw();
                 scenario_cards.push(card);
+            }
+            while((scenario_cards.length) > 0 && (scenario_cards.length < 4)) {
+                scenario_cards.push(...scenario_cards);
             }
             let scenario_sheet = new Cardistry.Sheet(scenario_cards);
             exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, false);
