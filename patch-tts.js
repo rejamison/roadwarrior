@@ -1,14 +1,11 @@
 const fs = require('fs');
+const { upload } = require('./autil');
 
 const save_file = process.argv[2];
 
+const BUCKET = 'road-warrior';
+
 const save = JSON.parse(fs.readFileSync(save_file));
-
-const ai_carver_biker = find('DeckCustom', 'ai_carver_biker')[0];
-ai_carver_biker.CustomDeck[Object.keys(ai_carver_biker.CustomDeck)[0]].FaceURL = 'TESTING';
-
-console.log(JSON.stringify(find('DeckCustom', 'ai_carver_biker'), null, 2));
-
 function find(name, nickname) {
     const objs = [];
     save.ObjectStates.forEach((o) => {
@@ -27,3 +24,14 @@ function find(name, nickname) {
     });
     return objs;
 }
+
+function main() {
+    upload(BUCKET, 'var/tts/ai_carver_hunter_back.png', 'image/png');
+
+    const ai_carver_biker = find('DeckCustom', 'ai_carver_biker')[0];
+    ai_carver_biker.CustomDeck[Object.keys(ai_carver_biker.CustomDeck)[0]].FaceURL = 'TESTING';
+
+    console.log(JSON.stringify(find('DeckCustom', 'ai_carver_biker'), null, 2));
+}
+
+main();
