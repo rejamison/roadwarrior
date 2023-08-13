@@ -353,19 +353,21 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.Box(this, attackBoxRect, attackBoxBgColor));
             attackBoxRect = attackBoxRect.shrink(20);
             addImagesRow(this, this.attackCostImages, attackBoxRect.cutPct(0, 0.66, 0, 0.8), attackBoxBgColor);
-            this.addElement(new Cardistry.ImageBox(
-                this,
-                attackBoxRect.cutPct(0, 0.66, 0.2, 0.2),
-                attackBoxBgColor,
-                this.attackArcImage,
-                false
-            ));
+            if(this.attackArcImage) {
+                this.addElement(new Cardistry.ImageBox(
+                    this,
+                    attackBoxRect.cutPct(0, 0.66, 0.2, 0.2),
+                    attackBoxBgColor,
+                    this.attackArcImage,
+                    false
+                ));
+            }
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackEffectText,
                 FONTS.rokkitt,
                 COLORS.black,
-                DEFAULT_TEXT_SIZE * 0.6,
+                DEFAULT_TEXT_SIZE * 0.55,
                 0,
                 'left',
                 'middle',
@@ -839,7 +841,13 @@ async function main() {
                     item['Attack Effect'],
                     item['Attack Arc'],
                     item['Attack Range']);
-                card.draw();
+                try {
+                    card.draw();
+                } catch(err) {
+                    console.error("ERROR: couldn't draw: " + item['Name Text']);
+                    throw err;
+                }
+
                 for(let i = 0; i < item['Qty']; i++) {
                     item_cards.push(card);
                 }

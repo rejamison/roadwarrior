@@ -15,6 +15,7 @@ function upload(bucket, file, content_type) {
             Bucket: bucket,
             Key: path.basename(file),
             ContentType: content_type,
+            CacheControl: 'no-cache',
             Body: data
         })).then((res) => {
             let url = "https://" + bucket + ".s3.us-west-2.amazonaws.com/" + path.basename(file);
