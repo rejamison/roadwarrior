@@ -6,6 +6,7 @@ const save_file = process.argv[2];
 const BUCKET = 'road-warrior';
 
 const save = JSON.parse(fs.readFileSync(save_file));
+
 function find(name, nickname) {
     const objs = [];
     save.ObjectStates.forEach((o) => {
@@ -23,6 +24,66 @@ function find(name, nickname) {
         }
     });
     return objs;
+}
+
+function uploadAndUpdateDie(name) {
+    return new Promise((resolve, reject) => {
+        // sanity check that the files exist
+        if(fs.existsSync('var/tts/' + name + '.png')) {
+            // sanity check a deck object exists in TTS save
+            if(find('Custom_Dice', name).length > 0) {
+                const die = find('Custom_Dice', name)[0];
+                upload(BUCKET, 'var/tts/' + name + '.png', 'image/png').then((url) => {
+                    die.CustomImage.ImageURL = url + '?' + Date.now();
+                    resolve();
+                }).catch((err) => {
+                    reject(err);
+                });
+            } else {
+                console.error("ERROR: Couldn't find die object in TTS save for: " + name);
+                reject(new Error("ERROR: Couldn't find die object in TTS save for: " + name));
+            }
+        } else {
+            console.error("ERROR:  Couldn't find PNG files for: " + name);
+            reject(new Error("ERROR:  Couldn't find PNG files for: " + name));
+        }
+    });
+}
+
+function uploadAndUpdateToken(name) {
+    return new Promise((resolve, reject) => {
+        // sanity check that the files exist
+        if(fs.existsSync('var/tts/' + name + '.png')) {
+            // sanity check a deck object exists in TTS save
+            const token = find('Custom_Token', name)[0];
+            upload(BUCKET, 'var/tts/' + name + '.png', 'image/png').then((url) => {
+                if(find('Custom_Token', name).length > 0) {
+                    token.CustomImage.ImageURL = url + '?' + Date.now();
+                    resolve();
+                } else {
+                    // add a new token object to the save
+                    console.log("Adding token: " + name);
+
+                    const bag = JSON.parse(fs.readFileSync('assets/token.json'));
+                    bag.GUID = '';
+                    bag.Transform.posX = bag.Transform.posX + 1;
+                    bag.Transform.posZ = bag.Transform.posZ + 1;
+
+                    const token = bag.ContainedObjects[0];
+                    token.GUID = '';
+                    token.Nickname = name;
+                    token.CustomImage.ImageURL = URL + '?' + Date.now();
+                    save.ObjectStates.push(bag);
+                    resolve();
+                }
+            }).catch((err) => {
+                reject(err);
+            });
+        } else {
+            console.error("ERROR:  Couldn't find PNG files for: " + name);
+            reject(new Error("ERROR:  Couldn't find PNG files for: " + name));
+        }
+    });
 }
 
 function uploadAndUpdateDeck(name, width, height) {
@@ -79,6 +140,22 @@ function main() {
     promises.push(uploadAndUpdateDeck('scenario_1_tier', 3, 2));
     promises.push(uploadAndUpdateDeck('scenario_2_tier', 3, 2));
     promises.push(uploadAndUpdateDeck('scenario_3_tier', 3, 2));
+
+    promises.push(uploadAndUpdateDie('die_black'));
+    promises.push(uploadAndUpdateDie('die_blue'));
+    promises.push(uploadAndUpdateDie('die_green'));
+    promises.push(uploadAndUpdateDie('die_orange'));
+    promises.push(uploadAndUpdateDie('die_purple'));
+    promises.push(uploadAndUpdateDie('die_red'));
+    promises.push(uploadAndUpdateDie('die_yellow'));
+
+    promises.push(uploadAndUpdateToken('token_boarder'));
+    promises.push(uploadAndUpdateToken('token_cooldown'));
+    promises.push(uploadAndUpdateToken('token_damage'));
+    promises.push(uploadAndUpdateToken('token_delay'));
+    promises.push(uploadAndUpdateToken('token_fire'));
+    promises.push(uploadAndUpdateToken('token_gas'));
+    promises.push(uploadAndUpdateToken('token_grapple'));
 
     Promise.all(promises).then(() => {
 //        console.log(JSON.stringify(find('DeckCustom', 'ai_carver_hunter'), null, 2));
