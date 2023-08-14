@@ -961,6 +961,18 @@ async function main() {
         let rule_back = new RoadWarriorCardBack('Rule', im.get('book'), COLORS.pink, COLORS.black, true);
         rule_back.draw();
         exportAndUpload(rule_back, 'var/tts/rule_back.png');
+
+        // export the card data for patcher to use
+        const stats = {
+            ais: ais,
+            scenarios: scenarios,
+            dice: dice,
+            vehicles: vehicles,
+            tokens: tokens,
+            rules: rules,
+            items: items
+        };
+        fs.writeFileSync('var/stats.json', JSON.stringify(stats, null, 2));
     });
 }
 main();

@@ -6,6 +6,7 @@ const save_file = process.argv[2];
 const BUCKET = 'road-warrior';
 
 const save = JSON.parse(fs.readFileSync(save_file));
+const stats = JSON.parse(fs.readFileSync('var/stats.json'));
 
 function find(name, nickname) {
     const objs = [];
@@ -66,13 +67,13 @@ function uploadAndUpdateToken(name) {
 
                     const bag = JSON.parse(fs.readFileSync('assets/token.json'));
                     bag.GUID = '';
-                    bag.Transform.posX = bag.Transform.posX + 1;
-                    bag.Transform.posZ = bag.Transform.posZ + 1;
+                    bag.Transform.posX = 0;
+                    bag.Transform.posZ = 0;
 
                     const token = bag.ContainedObjects[0];
                     token.GUID = '';
                     token.Nickname = name;
-                    token.CustomImage.ImageURL = URL + '?' + Date.now();
+                    token.CustomImage.ImageURL = url + '?' + Date.now();
                     save.ObjectStates.push(bag);
                     resolve();
                 }
@@ -86,8 +87,11 @@ function uploadAndUpdateToken(name) {
     });
 }
 
-function uploadAndUpdateDeck(name, width, height) {
+function uploadAndUpdateDeck(name, width, cin) {
     return new Promise((resolve, reject) => {
+        let count = cin > 1 ? cin : 2;  // because TTS has to have at least 2 cards in a deck
+        let height = Math.ceil(count / width);  // because TTS has to have at least 2 rows in a deck front image
+        if(height === 1) height = 2;
         // sanity check that the files exist
         if(fs.existsSync('var/tts/' + name + '_back.png') && fs.existsSync('var/tts/' + name + '_fronts.png')) {
             // sanity check a deck object exists in TTS save
@@ -98,6 +102,27 @@ function uploadAndUpdateDeck(name, width, height) {
                     deck.CustomDeck[deckId].BackURL = url + '?' + Date.now();
 
                     upload(BUCKET, 'var/tts/' + name + '_fronts.png', 'image/png').then((url) => {
+                        // check if there are the right number of cards in the existing deck
+                        if(deck.DeckIDs.length < count) {
+                            console.log("Adding cards to: " + name);
+
+                            while(deck.DeckIDs.length < count) {
+                                let nextId = deck.DeckIDs[deck.DeckIDs.length - 1] + 1;
+                                let card = JSON.parse(fs.readFileSync('assets/card.json'));
+                                deck.DeckIDs.push(nextId);
+                                card.CardID = nextId;
+                                card.GUID = '';
+                                card.nickname = '';  // TODO: Add card names?
+                                deck.ContainedObjects.push(card);
+                            }
+                        } else if(deck.DeckIDs.length > count) {
+                            console.log("Removing cards from: " + name);
+                            while(deck.DeckIDs.length > count) {
+                                const rem = deck.DeckIDs.pop();
+                                deck.ContainedObjects = deck.ContainedObjects.filter((val) => val.CardID !== rem);
+                            }
+                        }
+
                         deck.CustomDeck[deckId].FaceURL = url + '?' + Date.now();
                         deck.CustomDeck[deckId].NumWidth = width;
                         deck.CustomDeck[deckId].NumHeight = height;
@@ -119,43 +144,44 @@ function uploadAndUpdateDeck(name, width, height) {
     });
 }
 
+/**
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+function convertToFilename(str) {
+    return str.toLowerCase().replace(/[ .-]+/g, '_');
+}
+
+
 function main() {
     const promises = [];
 
-    promises.push(uploadAndUpdateDeck('ai_carver_hunter', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_carver_meat_wagon', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_roadie_biker', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_roadie_bus', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_roadie_dune_buggy', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_roadie_wyld_horsemen', 5, 2));
-    promises.push(uploadAndUpdateDeck('ai_u_r_of_f_scout', 5, 2));
-    promises.push(uploadAndUpdateDeck('initiative', 5, 6));
-    promises.push(uploadAndUpdateDeck('item_0_tier', 5, 6));
-    promises.push(uploadAndUpdateDeck('item_1_tier', 5, 5));
-    promises.push(uploadAndUpdateDeck('item_2_tier', 5, 3));
-    promises.push(uploadAndUpdateDeck('item_3_tier', 5, 2));
-    promises.push(uploadAndUpdateDeck('item_starter', 5, 2));
-    promises.push(uploadAndUpdateDeck('rule', 3, 6));
-    promises.push(uploadAndUpdateDeck('scenario_0_tier', 3, 2));
-    promises.push(uploadAndUpdateDeck('scenario_1_tier', 3, 2));
-    promises.push(uploadAndUpdateDeck('scenario_2_tier', 3, 2));
-    promises.push(uploadAndUpdateDeck('scenario_3_tier', 3, 2));
+    for(let aiKey in stats.ais) {
+        let count = Object.values(stats.ais[aiKey]).reduce((acc, val) => acc + parseInt(val.Qty), 0);
+        promises.push(uploadAndUpdateDeck('ai_' + convertToFilename(aiKey), 5, count));
+    }
 
-    promises.push(uploadAndUpdateDie('die_black'));
-    promises.push(uploadAndUpdateDie('die_blue'));
-    promises.push(uploadAndUpdateDie('die_green'));
-    promises.push(uploadAndUpdateDie('die_orange'));
-    promises.push(uploadAndUpdateDie('die_purple'));
-    promises.push(uploadAndUpdateDie('die_red'));
-    promises.push(uploadAndUpdateDie('die_yellow'));
+    promises.push(uploadAndUpdateDeck('initiative', 5, Object.keys(stats.vehicles).length));
 
-    promises.push(uploadAndUpdateToken('token_boarder'));
-    promises.push(uploadAndUpdateToken('token_cooldown'));
-    promises.push(uploadAndUpdateToken('token_damage'));
-    promises.push(uploadAndUpdateToken('token_delay'));
-    promises.push(uploadAndUpdateToken('token_fire'));
-    promises.push(uploadAndUpdateToken('token_gas'));
-    promises.push(uploadAndUpdateToken('token_grapple'));
+    for(let itemKey in stats.items) {
+        let count = Object.values(stats.items[itemKey]).reduce((acc, val) => acc + parseInt(val.Qty), 0);
+        promises.push(uploadAndUpdateDeck('item_' + convertToFilename(itemKey), 5, count));
+    }
+
+    promises.push(uploadAndUpdateDeck('rule', 3, Object.keys(stats.rules).length));
+
+    for(let scenarioKey in stats.scenarios) {
+        promises.push(uploadAndUpdateDeck('scenario_' + convertToFilename(scenarioKey), 3, Object.keys(stats.scenarios[scenarioKey]).length));
+    }
+
+    for(let dieKey in stats.dice) {
+        promises.push(uploadAndUpdateDie(dieKey));
+    }
+
+    for(let tokenKey in stats.tokens) {
+        promises.push(uploadAndUpdateToken(tokenKey));
+    }
 
     Promise.all(promises).then(() => {
 //        console.log(JSON.stringify(find('DeckCustom', 'ai_carver_hunter'), null, 2));

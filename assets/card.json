@@ -1,0 +1,47 @@
+{
+  "GUID": "REPLACE_ME",
+  "Name": "Card",
+  "Transform": {
+    "posX": 47.8312645,
+    "posY": 1.70759737,
+    "posZ": 6.51985741,
+    "rotX": -0.000008836304,
+    "rotY": 180,
+    "rotZ": 180,
+    "scaleX": 1,
+    "scaleY": 1,
+    "scaleZ": 1
+  },
+  "Nickname": "",
+  "Description": "",
+  "GMNotes": "",
+  "AltLookAngle": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "ColorDiffuse": {
+    "r": 0.713235259,
+    "g": 0.713235259,
+    "b": 0.713235259
+  },
+  "LayoutGroupSortIndex": 0,
+  "Value": 0,
+  "Locked": false,
+  "Grid": true,
+  "Snap": true,
+  "IgnoreFoW": false,
+  "MeasureMovement": false,
+  "DragSelectable": true,
+  "Autoraise": true,
+  "Sticky": true,
+  "Tooltip": true,
+  "GridProjection": false,
+  "Hands": true,
+  "CardID": 999999,
+  "SidewaysCard": false,
+  "LuaScript": "",
+  "LuaScriptState": "",
+  "XmlUI": "",
+  "ContainedObjects": []
+}

@@ -1,7 +1,7 @@
 {
-  "SaveName": "Mad Max Base V6",
-  "EpochTime": 1691959196,
-  "Date": "8/13/2023 1:39:56 PM",
+  "SaveName": "Mad Max Base V7",
+  "EpochTime": 1691974106,
+  "Date": "8/13/2023 5:48:26 PM",
   "VersionNumber": "v13.2.2",
   "GameMode": "Mad Max Base",
   "GameType": "Game",
@@ -234,7 +234,7 @@
         "posX": 0.678802848,
         "posY": 1.74610484,
         "posZ": 37.6316223,
-        "rotX": -8.860486E-06,
+        "rotX": -8.975737E-06,
         "rotY": 179.996735,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -283,8 +283,8 @@
       ],
       "CustomDeck": {
         "54": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_hunter_fronts.png?1691959051754",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_hunter_back.png?1691959050447",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_hunter_fronts.png?1691974018879",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_hunter_back.png?1691974017498",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -775,7 +775,7 @@
         "posX": 11.1048222,
         "posY": 1.72684944,
         "posZ": 32.1926727,
-        "rotX": -8.314117E-06,
+        "rotX": -9.536539E-06,
         "rotY": 180.014175,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -820,8 +820,8 @@
       ],
       "CustomDeck": {
         "55": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_dune_buggy_fronts.png?1691959050535",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_dune_buggy_back.png?1691959050244",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_dune_buggy_fronts.png?1691974018510",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_dune_buggy_back.png?1691974017427",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -1135,7 +1135,7 @@
         "posX": -9.558638,
         "posY": 1.73647773,
         "posZ": 31.67823,
-        "rotX": -9.338687E-06,
+        "rotX": -9.503097E-06,
         "rotY": 180.0013,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -1182,8 +1182,8 @@
       ],
       "CustomDeck": {
         "44": {
-          "FaceURL": "http://cloud-3.steamusercontent.com/ugc/2026109500948231171/51ECB468F07725F4B7ACCDE240C511A818179393/",
-          "BackURL": "http://cloud-3.steamusercontent.com/ugc/2026108776231102649/B1CD6FBFD0721E5D49137CFA868F05225C449F66/",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_van_fronts.png?1691974018616",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_van_back.png?1691974017421",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -1580,7 +1580,7 @@
         "posX": 24.8312263,
         "posY": 1.84239268,
         "posZ": -8.249517,
-        "rotX": -9.122397E-06,
+        "rotX": -9.232504E-06,
         "rotY": 180.013657,
         "rotZ": 180.0,
         "scaleX": 1.0,
@@ -1649,8 +1649,8 @@
       ],
       "CustomDeck": {
         "56": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_0_tier_fronts.png?1691959052626",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_0_tier_back.png?1691959050259",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_0_tier_fronts.png?1691974019849",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_0_tier_back.png?1691974017398",
           "NumWidth": 5,
           "NumHeight": 6,
           "BackIsHidden": false,
@@ -3081,7 +3081,7 @@
         "posX": 27.7589912,
         "posY": 1.81350839,
         "posZ": -8.219888,
-        "rotX": -9.0950125E-06,
+        "rotX": -9.12484848E-06,
         "rotY": 180.016022,
         "rotZ": 180.0,
         "scaleX": 1.0,
@@ -3144,8 +3144,8 @@
       ],
       "CustomDeck": {
         "57": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_1_tier_fronts.png?1691959052450",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_1_tier_back.png?1691959050285",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_1_tier_fronts.png?1691974019588",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_1_tier_back.png?1691974017403",
           "NumWidth": 5,
           "NumHeight": 5,
           "BackIsHidden": false,
@@ -4294,9 +4294,9 @@
         "posX": 11.2377033,
         "posY": 1.75058126,
         "posZ": 11.1560764,
-        "rotX": -5.797317E-06,
+        "rotX": -5.797318E-06,
         "rotY": 180.02916,
-        "rotZ": 2.15420819E-08,
+        "rotZ": 2.15420748E-08,
         "scaleX": 1.74999952,
         "scaleY": 1.74999952,
         "scaleZ": 1.74999952
@@ -4363,7 +4363,7 @@
       "ColorDiffuse": {
         "r": 0.602941155,
         "g": 0.519287646,
-        "b": 0.443336666
+        "b": 0.4433366
       },
       "LayoutGroupSortIndex": 0,
       "Value": 0,
@@ -4462,9 +4462,9 @@
         "posX": 11.1018467,
         "posY": 2.78926635,
         "posZ": 12.3572245,
-        "rotX": 1.01805526E-05,
+        "rotX": 1.07093892E-05,
         "rotY": 270.0225,
-        "rotZ": -8.566528E-06,
+        "rotZ": -8.375058E-06,
         "scaleX": 0.275000364,
         "scaleY": 0.275000364,
         "scaleZ": 0.275000364
@@ -4527,9 +4527,9 @@
         "posX": -4.790099,
         "posY": 1.69272482,
         "posZ": 31.1744251,
-        "rotX": 1.14704189E-05,
-        "rotY": 0.013637769,
-        "rotZ": -3.13511975E-07,
+        "rotX": 1.15100474E-05,
+        "rotY": 0.0136409607,
+        "rotZ": -3.13510441E-07,
         "scaleX": 0.250000417,
         "scaleY": 0.250000417,
         "scaleZ": 0.250000417
@@ -4590,11 +4590,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": 6.271855,
-        "posY": 1.69504762,
+        "posY": 1.69504786,
         "posZ": 29.7773514,
-        "rotX": 9.981078E-06,
-        "rotY": -0.004649522,
-        "rotZ": 1.16338379E-06,
+        "rotX": 1.0171203E-05,
+        "rotY": -0.004649518,
+        "rotZ": 1.109531E-06,
         "scaleX": 0.5000004,
         "scaleY": 0.5000004,
         "scaleZ": 0.5000004
@@ -4655,11 +4655,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": -4.346981,
-        "posY": 1.69272387,
+        "posY": 1.692724,
         "posZ": 36.0097923,
-        "rotX": 8.642043E-06,
-        "rotY": 0.01351665,
-        "rotZ": -1.29476791E-06,
+        "rotX": 8.774248E-06,
+        "rotY": 0.0135166533,
+        "rotZ": -1.51156871E-06,
         "scaleX": 0.250000417,
         "scaleY": 0.250000417,
         "scaleZ": 0.250000417
@@ -4673,7 +4673,7 @@
         "z": 0.0
       },
       "ColorDiffuse": {
-        "r": 0.0519510135,
+        "r": 0.05195096,
         "g": 0.0,
         "b": 1.0
       },
@@ -4720,11 +4720,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": 4.33574438,
-        "posY": 1.69504738,
+        "posY": 1.69504762,
         "posZ": 30.2616024,
-        "rotX": 6.769072E-06,
-        "rotY": -0.003850275,
-        "rotZ": -1.48102424E-06,
+        "rotX": 6.709268E-06,
+        "rotY": -0.00385025144,
+        "rotZ": 6.95600249E-07,
         "scaleX": 0.5000004,
         "scaleY": 0.5000004,
         "scaleZ": 0.5000004
@@ -4785,11 +4785,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": 6.666691,
-        "posY": 1.69504714,
+        "posY": 1.6950469,
         "posZ": 33.1471329,
-        "rotX": 7.723515E-06,
-        "rotY": -0.004031766,
-        "rotZ": -6.562748E-08,
+        "rotX": 7.910334E-06,
+        "rotY": -0.0040317555,
+        "rotZ": -3.95233741E-07,
         "scaleX": 0.5000004,
         "scaleY": 0.5000004,
         "scaleZ": 0.5000004
@@ -4804,8 +4804,8 @@
       },
       "ColorDiffuse": {
         "r": 0.9559999,
-        "g": 0.3919995,
-        "b": 0.112999521
+        "g": 0.391999453,
+        "b": 0.112999462
       },
       "LayoutGroupSortIndex": 0,
       "Value": 0,
@@ -4850,11 +4850,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": 4.73067236,
-        "posY": 1.6950469,
+        "posY": 1.69504714,
         "posZ": 33.8283577,
-        "rotX": 1.09161629E-05,
-        "rotY": -0.00357398367,
-        "rotZ": 6.75840056E-07,
+        "rotX": 1.103907E-05,
+        "rotY": -0.00357398274,
+        "rotZ": 4.38828E-07,
         "scaleX": 0.5000004,
         "scaleY": 0.5000004,
         "scaleZ": 0.5000004
@@ -4869,8 +4869,8 @@
       },
       "ColorDiffuse": {
         "r": 0.9559999,
-        "g": 0.3919995,
-        "b": 0.112999521
+        "g": 0.391999453,
+        "b": 0.112999462
       },
       "LayoutGroupSortIndex": 0,
       "Value": 0,
@@ -4917,7 +4917,7 @@
         "posX": -9.696559,
         "posY": 1.73166275,
         "posZ": 37.4205437,
-        "rotX": -9.930738E-06,
+        "rotX": -1.0031612E-05,
         "rotY": 179.984848,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -4963,8 +4963,8 @@
       ],
       "CustomDeck": {
         "58": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_meat_wagon_fronts.png?1691959051453",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_meat_wagon_back.png?1691959050313",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_meat_wagon_fronts.png?1691974018748",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_carver_meat_wagon_back.png?1691974017480",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -5314,7 +5314,7 @@
         "posX": 0.4698308,
         "posY": 1.72684944,
         "posZ": 32.05272,
-        "rotX": -8.152946E-06,
+        "rotX": -8.132948E-06,
         "rotY": 180.005173,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -5359,8 +5359,8 @@
       ],
       "CustomDeck": {
         "59": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_biker_fronts.png?1691959051517",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_biker_back.png?1691959050375",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_biker_fronts.png?1691974018669",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_biker_back.png?1691974017513",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -5663,7 +5663,7 @@
         "posX": 48.7384529,
         "posY": 1.722038,
         "posZ": 15.4014587,
-        "rotX": -9.177695E-06,
+        "rotX": -9.202408E-06,
         "rotY": 180.0256,
         "rotZ": 180.0,
         "scaleX": 1.99538171,
@@ -5707,8 +5707,8 @@
       ],
       "CustomDeck": {
         "60": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_1_tier_fronts.png?1691959050787",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_1_tier_back.png?1691959050257",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_1_tier_fronts.png?1691974019476",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_1_tier_back.png?1691974017425",
           "NumWidth": 3,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -5964,7 +5964,7 @@
         "posX": 48.69589,
         "posY": 1.726851,
         "posZ": 22.4700527,
-        "rotX": -8.574109E-06,
+        "rotX": -8.699549E-06,
         "rotY": 180.013733,
         "rotZ": 180.0,
         "scaleX": 1.99688435,
@@ -6009,8 +6009,8 @@
       ],
       "CustomDeck": {
         "61": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1691959052201",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1691959050274",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1691974019536",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1691974017411",
           "NumWidth": 3,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -6313,7 +6313,7 @@
         "posX": -14.6243658,
         "posY": 1.8279444,
         "posZ": 31.0698586,
-        "rotX": -1.0900515E-05,
+        "rotX": -8.809996E-06,
         "rotY": 180.0,
         "rotZ": 180.0,
         "scaleX": 0.6713847,
@@ -6379,8 +6379,8 @@
       ],
       "CustomDeck": {
         "62": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/initiative_fronts.png?1691959051726",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/initiative_back.png?1691959050232",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/initiative_fronts.png?1691974018806",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/initiative_back.png?1691974017350",
           "NumWidth": 5,
           "NumHeight": 6,
           "BackIsHidden": false,
@@ -7679,11 +7679,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 38.6427269,
-        "posY": 1.66003692,
+        "posY": 1.6600368,
         "posZ": 16.411644,
-        "rotX": 1.12463431E-05,
-        "rotY": 1.565308E-05,
-        "rotZ": -2.5945684E-07,
+        "rotX": 1.09288676E-05,
+        "rotY": 1.5605945E-05,
+        "rotZ": -3.103435E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -7763,7 +7763,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_grapple.png?1691959050257",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_grapple.png?1691974017339",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -7785,11 +7785,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 38.77082,
-        "posY": 1.66003573,
+        "posY": 1.66003561,
         "posZ": 23.730629,
-        "rotX": 6.6851826E-06,
-        "rotY": -4.396287E-05,
-        "rotZ": -1.66741029E-06,
+        "rotX": 7.20110256E-06,
+        "rotY": -4.38922252E-05,
+        "rotZ": -3.98643465E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -7869,7 +7869,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_boarder.png?1691959050369",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_boarder.png?1691974017372",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -7893,9 +7893,9 @@
         "posX": 39.0664444,
         "posY": 1.66003644,
         "posZ": 20.0354881,
-        "rotX": 8.002415E-06,
-        "rotY": -2.55241139E-05,
-        "rotZ": -9.116625E-09,
+        "rotX": 5.2739947E-06,
+        "rotY": -2.54792849E-05,
+        "rotZ": -1.49818348E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -7975,7 +7975,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_damage.png?1691959050284",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_damage.png?1691974017387",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -7997,11 +7997,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 41.6442261,
-        "posY": 1.66003621,
+        "posY": 1.6600368,
         "posZ": 20.17351,
-        "rotX": 9.490639E-06,
-        "rotY": 2.42022579E-05,
-        "rotZ": -1.52945162E-07,
+        "rotX": 9.8153E-06,
+        "rotY": 2.42532224E-05,
+        "rotZ": -2.44760315E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8081,7 +8081,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_fire.png?1691959050346",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_fire.png?1691974017353",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8103,11 +8103,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 41.5569344,
-        "posY": 1.66003561,
+        "posY": 1.66003573,
         "posZ": 23.5771885,
-        "rotX": 1.16732808E-05,
-        "rotY": -0.00133080373,
-        "rotZ": 1.5684348E-08,
+        "rotX": 9.597947E-06,
+        "rotY": -0.00133043958,
+        "rotZ": 6.5705234E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8187,7 +8187,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_delay.png?1691959050331",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_delay.png?1691974017325",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8211,9 +8211,9 @@
         "posX": 38.0785,
         "posY": 1.660039,
         "posZ": 4.689965,
-        "rotX": 6.710837E-06,
-        "rotY": 1.35980035E-05,
-        "rotZ": -5.0287565E-07,
+        "rotX": 8.48642048E-06,
+        "rotY": 1.35874061E-05,
+        "rotZ": -9.54237436E-08,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8293,7 +8293,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_yellow.png?1691959050291",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_yellow.png?1691974017419",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8362,11 +8362,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 37.8784027,
-        "posY": 1.66003942,
+        "posY": 1.66003931,
         "posZ": 1.54189622,
-        "rotX": 7.76484E-06,
-        "rotY": -2.18220839E-06,
-        "rotZ": 6.38935148E-07,
+        "rotX": 7.983276E-06,
+        "rotY": -2.0894206E-06,
+        "rotZ": 6.367586E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8446,7 +8446,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_orange.png?1691959050288",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_orange.png?1691974017403",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8515,11 +8515,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 37.71599,
-        "posY": 1.66003978,
+        "posY": 1.6600399,
         "posZ": -1.55880821,
-        "rotX": 6.196669E-06,
-        "rotY": 1.7328191E-06,
-        "rotZ": -6.0176194E-07,
+        "rotX": 6.55362237E-06,
+        "rotY": 1.77575691E-06,
+        "rotZ": -5.1534164E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8599,7 +8599,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_red.png?1691959050303",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_red.png?1691974017383",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8668,11 +8668,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 40.9405,
-        "posY": 1.66003859,
+        "posY": 1.66003847,
         "posZ": 4.77517128,
-        "rotX": 7.185189E-06,
-        "rotY": 7.382038E-06,
-        "rotZ": -8.778717E-07,
+        "rotX": 6.861918E-06,
+        "rotY": 7.42096336E-06,
+        "rotZ": -1.76105857E-06,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8752,7 +8752,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_blue.png?1691959050247",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_blue.png?1691974017395",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8821,11 +8821,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 40.4907875,
-        "posY": 1.66003942,
+        "posY": 1.660039,
         "posZ": 1.72362876,
-        "rotX": 7.812563E-06,
-        "rotY": -2.03156037E-06,
-        "rotZ": -1.55545035E-06,
+        "rotX": 7.43068267E-06,
+        "rotY": -1.97773147E-06,
+        "rotZ": -2.3807504E-06,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -8905,7 +8905,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_green.png?1691959050291",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_green.png?1691974017359",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -8974,11 +8974,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 40.6193733,
-        "posY": 1.66003954,
+        "posY": 1.6600399,
         "posZ": -1.18845427,
-        "rotX": 9.385932E-06,
-        "rotY": -6.2868553E-06,
-        "rotZ": -4.74881347E-07,
+        "rotX": 9.800611E-06,
+        "rotY": -6.507364E-06,
+        "rotZ": 4.054655E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -9058,7 +9058,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_purple.png?1691959050280",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_purple.png?1691974017343",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -9127,11 +9127,11 @@
       "Name": "Infinite_Bag",
       "Transform": {
         "posX": 39.1655579,
-        "posY": 1.66004,
+        "posY": 1.66004014,
         "posZ": -4.08005047,
-        "rotX": 1.17145491E-05,
-        "rotY": -2.15786235E-06,
-        "rotZ": 1.88861762E-07,
+        "rotX": 9.51419E-06,
+        "rotY": -1.952989E-06,
+        "rotZ": -9.880868E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -9211,7 +9211,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_black.png?1691959050319",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/die_black.png?1691974017401",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -9282,7 +9282,7 @@
         "posX": 21.8873119,
         "posY": 1.72685575,
         "posZ": -8.241662,
-        "rotX": -9.832318E-06,
+        "rotX": -9.821298E-06,
         "rotY": 179.99855,
         "rotZ": 180.0,
         "scaleX": 1.0,
@@ -9327,8 +9327,8 @@
       ],
       "CustomDeck": {
         "63": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_starter_fronts.png?1691959051168",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_starter_back.png?1691959050295",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_starter_fronts.png?1691974018019",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_starter_back.png?1691974017386",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -9697,9 +9697,9 @@
         "posX": 41.4875259,
         "posY": 1.660037,
         "posZ": 16.4131279,
-        "rotX": 1.161523E-05,
-        "rotY": 1.853206E-05,
-        "rotZ": -4.22764941E-07,
+        "rotX": 1.244688E-05,
+        "rotY": 1.86905763E-05,
+        "rotZ": -3.27446855E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -9779,7 +9779,7 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_gas.png?1691959050287",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_gas.png?1691974017373",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
@@ -9800,11 +9800,11 @@
       "GUID": "372a17",
       "Name": "Die_10",
       "Transform": {
-        "posX": 24.1213036,
-        "posY": 3.149727,
-        "posZ": 4.084193,
+        "posX": 24.121624,
+        "posY": 3.1497283,
+        "posZ": 4.08617258,
         "rotX": 321.077637,
-        "rotY": 260.8863,
+        "rotY": 260.886261,
         "rotZ": 91.7295,
         "scaleX": 1.0,
         "scaleY": 1.0,
@@ -9929,11 +9929,11 @@
       "Name": "Die_6_Rounded",
       "Transform": {
         "posX": 25.2900486,
-        "posY": 3.137007,
-        "posZ": 6.12874126,
-        "rotX": 9.152182E-06,
-        "rotY": 2.78476764E-05,
-        "rotZ": -1.32085E-06,
+        "posY": 3.13700724,
+        "posZ": 6.128741,
+        "rotX": 9.294824E-06,
+        "rotY": 2.92732911E-05,
+        "rotZ": 2.11367052E-07,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -10027,9 +10027,9 @@
         "posX": 15.1238871,
         "posY": 1.680663,
         "posZ": 30.6660252,
-        "rotX": 1.14346367E-05,
-        "rotY": -3.27744674E-05,
-        "rotZ": 3.63423823E-07,
+        "rotX": 9.658093E-06,
+        "rotY": -3.276321E-05,
+        "rotZ": -1.21065477E-06,
         "scaleX": 0.650000334,
         "scaleY": 0.650000334,
         "scaleZ": 0.650000334
@@ -10090,11 +10090,11 @@
       "Name": "Custom_Model",
       "Transform": {
         "posX": 17.6219616,
-        "posY": 1.680663,
+        "posY": 1.68066311,
         "posZ": 31.0882721,
-        "rotX": 8.558621E-06,
-        "rotY": -3.65128071E-05,
-        "rotZ": -2.14930424E-06,
+        "rotX": 8.635701E-06,
+        "rotY": -3.64946754E-05,
+        "rotZ": -2.006528E-06,
         "scaleX": 0.650000334,
         "scaleY": 0.650000334,
         "scaleZ": 0.650000334
@@ -10157,7 +10157,7 @@
         "posX": 23.0942574,
         "posY": 1.74610567,
         "posZ": 32.18278,
-        "rotX": -8.407668E-06,
+        "rotX": -8.529317E-06,
         "rotY": 180.308792,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -10206,8 +10206,8 @@
       ],
       "CustomDeck": {
         "64": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_bus_fronts.png?1691959051798",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_bus_back.png?1691959050307",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_bus_fronts.png?1691974019173",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_bus_back.png?1691974017466",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -10698,9 +10698,9 @@
         "posX": 26.995821,
         "posY": 1.67590845,
         "posZ": 31.7816143,
-        "rotX": 7.19656646E-06,
-        "rotY": 0.0104605062,
-        "rotZ": 1.286769E-05,
+        "rotX": 8.255594E-06,
+        "rotY": 0.0104480041,
+        "rotZ": -1.348641E-07,
         "scaleX": 0.375000447,
         "scaleY": 0.375000447,
         "scaleZ": 0.375000447
@@ -10763,9 +10763,9 @@
         "posX": 29.5699749,
         "posY": 1.67590845,
         "posZ": 31.8541527,
-        "rotX": 7.731058E-06,
-        "rotY": 0.0104252268,
-        "rotZ": 4.370079E-06,
+        "rotX": 6.566707E-06,
+        "rotY": 0.0104036573,
+        "rotZ": 1.31213064E-05,
         "scaleX": 0.375000447,
         "scaleY": 0.375000447,
         "scaleZ": 0.375000447
@@ -10781,7 +10781,7 @@
       "ColorDiffuse": {
         "r": 0.0,
         "g": 1.0,
-        "b": 0.189020842
+        "b": 0.189020783
       },
       "LayoutGroupSortIndex": 0,
       "Value": 0,
@@ -10828,9 +10828,9 @@
         "posX": 55.94527,
         "posY": 1.78461719,
         "posZ": 37.4565125,
-        "rotX": -9.27345E-06,
+        "rotX": -9.306596E-06,
         "rotY": 180.0,
-        "rotZ": -5.02393256E-08,
+        "rotZ": -4.06083E-08,
         "scaleX": 2.79923534,
         "scaleY": 1.0,
         "scaleZ": 2.79923534
@@ -10885,8 +10885,8 @@
       ],
       "CustomDeck": {
         "65": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/rule_fronts.png?1691959052704",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/rule_back.png?1691959050297",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/rule_fronts.png?1691974019691",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/rule_back.png?1691974017380",
           "NumWidth": 3,
           "NumHeight": 6,
           "BackIsHidden": false,
@@ -11753,7 +11753,7 @@
         "posX": 10.7863064,
         "posY": 1.72684777,
         "posZ": 43.26426,
-        "rotX": -9.318259E-06,
+        "rotX": -8.181609E-06,
         "rotY": 179.990875,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -11798,8 +11798,8 @@
       ],
       "CustomDeck": {
         "66": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_u_r_of_f_scout_fronts.png?1691959051326",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_u_r_of_f_scout_back.png?1691959050407",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_u_r_of_f_scout_fronts.png?1691974018556",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_u_r_of_f_scout_back.png?1691974017508",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -12113,7 +12113,7 @@
         "posX": 33.94226,
         "posY": 1.72684956,
         "posZ": 32.00476,
-        "rotX": -1.03159846E-05,
+        "rotX": -1.03056136E-05,
         "rotY": 179.997025,
         "rotZ": 180.0,
         "scaleX": 1.53204679,
@@ -12158,8 +12158,8 @@
       ],
       "CustomDeck": {
         "67": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_wyld_horsemen_fronts.png?1691959051655",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_wyld_horsemen_back.png?1691959050360",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_wyld_horsemen_fronts.png?1691974018662",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/ai_roadie_wyld_horsemen_back.png?1691974017423",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -12181,9 +12181,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12228,9 +12228,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12275,9 +12275,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12322,9 +12322,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12369,9 +12369,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12416,9 +12416,9 @@
             "rotX": -5.008956E-06,
             "rotY": 180.0,
             "rotZ": 180.0,
-            "scaleX": 1.0,
+            "scaleX": 1.53204679,
             "scaleY": 1.0,
-            "scaleZ": 1.0
+            "scaleZ": 1.53204679
           },
           "Nickname": "",
           "Description": "",
@@ -12460,9 +12460,9 @@
       "Name": "DeckCustom",
       "Transform": {
         "posX": 48.7407455,
-        "posY": 1.71722507,
+        "posY": 1.707597,
         "posZ": 8.427075,
-        "rotX": -9.212414E-06,
+        "rotX": -9.340558E-06,
         "rotY": 179.983536,
         "rotZ": 180.0,
         "scaleX": 1.99495173,
@@ -12499,14 +12499,12 @@
       "SidewaysCard": false,
       "DeckIDs": [
         6800,
-        6801,
-        6802,
-        6803
+        6801
       ],
       "CustomDeck": {
         "68": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_2_tier_fronts.png?1691959052203",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_2_tier_back.png?1691959050317",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_2_tier_fronts.png?1691974019228",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_2_tier_back.png?1691974017401",
           "NumWidth": 3,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -12611,100 +12609,6 @@
           "LuaScriptState": "",
           "XmlUI": "",
           "ContainedObjects": []
-        },
-        {
-          "GUID": "9e1303",
-          "Name": "Card",
-          "Transform": {
-            "posX": 47.8312645,
-            "posY": 1.70759737,
-            "posZ": 6.51985741,
-            "rotX": -8.836304E-06,
-            "rotY": 180.0,
-            "rotZ": 180.0,
-            "scaleX": 1.0,
-            "scaleY": 1.0,
-            "scaleZ": 1.0
-          },
-          "Nickname": "",
-          "Description": "",
-          "GMNotes": "",
-          "AltLookAngle": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "ColorDiffuse": {
-            "r": 0.713235259,
-            "g": 0.713235259,
-            "b": 0.713235259
-          },
-          "LayoutGroupSortIndex": 0,
-          "Value": 0,
-          "Locked": false,
-          "Grid": true,
-          "Snap": true,
-          "IgnoreFoW": false,
-          "MeasureMovement": false,
-          "DragSelectable": true,
-          "Autoraise": true,
-          "Sticky": true,
-          "Tooltip": true,
-          "GridProjection": false,
-          "Hands": true,
-          "CardID": 6802,
-          "SidewaysCard": false,
-          "LuaScript": "",
-          "LuaScriptState": "",
-          "XmlUI": "",
-          "ContainedObjects": []
-        },
-        {
-          "GUID": "d76e07",
-          "Name": "Card",
-          "Transform": {
-            "posX": 47.8312645,
-            "posY": 1.70759737,
-            "posZ": 6.51985741,
-            "rotX": -8.836304E-06,
-            "rotY": 180.0,
-            "rotZ": 180.0,
-            "scaleX": 1.0,
-            "scaleY": 1.0,
-            "scaleZ": 1.0
-          },
-          "Nickname": "",
-          "Description": "",
-          "GMNotes": "",
-          "AltLookAngle": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "ColorDiffuse": {
-            "r": 0.713235259,
-            "g": 0.713235259,
-            "b": 0.713235259
-          },
-          "LayoutGroupSortIndex": 0,
-          "Value": 0,
-          "Locked": false,
-          "Grid": true,
-          "Snap": true,
-          "IgnoreFoW": false,
-          "MeasureMovement": false,
-          "DragSelectable": true,
-          "Autoraise": true,
-          "Sticky": true,
-          "Tooltip": true,
-          "GridProjection": false,
-          "Hands": true,
-          "CardID": 6803,
-          "SidewaysCard": false,
-          "LuaScript": "",
-          "LuaScriptState": "",
-          "XmlUI": "",
-          "ContainedObjects": []
         }
       ]
     },
@@ -12713,9 +12617,9 @@
       "Name": "DeckCustom",
       "Transform": {
         "posX": 48.7117462,
-        "posY": 1.71722615,
-        "posZ": 1.82283378,
-        "rotX": -7.496515E-06,
+        "posY": 1.70759809,
+        "posZ": 1.82283366,
+        "rotX": -8.040336E-06,
         "rotY": 180.021255,
         "rotZ": 180.0,
         "scaleX": 1.93762064,
@@ -12752,14 +12656,12 @@
       "SidewaysCard": false,
       "DeckIDs": [
         6900,
-        6901,
-        6902,
-        6903
+        6901
       ],
       "CustomDeck": {
         "69": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_3_tier_fronts.png?1691959052033",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_3_tier_back.png?1691959050310",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_3_tier_fronts.png?1691974019232",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_3_tier_back.png?1691974017396",
           "NumWidth": 3,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -12875,100 +12777,6 @@
           "LuaScriptState": "",
           "XmlUI": "",
           "ContainedObjects": []
-        },
-        {
-          "GUID": "d46173",
-          "Name": "Card",
-          "Transform": {
-            "posX": 46.4921837,
-            "posY": 2.70775151,
-            "posZ": 1.48444772,
-            "rotX": -5.008956E-06,
-            "rotY": 180.0,
-            "rotZ": 180.0,
-            "scaleX": 1.0,
-            "scaleY": 1.0,
-            "scaleZ": 1.0
-          },
-          "Nickname": "",
-          "Description": "",
-          "GMNotes": "",
-          "AltLookAngle": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "ColorDiffuse": {
-            "r": 0.713235259,
-            "g": 0.713235259,
-            "b": 0.713235259
-          },
-          "LayoutGroupSortIndex": 0,
-          "Value": 0,
-          "Locked": false,
-          "Grid": true,
-          "Snap": true,
-          "IgnoreFoW": false,
-          "MeasureMovement": false,
-          "DragSelectable": true,
-          "Autoraise": true,
-          "Sticky": true,
-          "Tooltip": true,
-          "GridProjection": false,
-          "Hands": true,
-          "CardID": 6902,
-          "SidewaysCard": false,
-          "LuaScript": "",
-          "LuaScriptState": "",
-          "XmlUI": "",
-          "ContainedObjects": []
-        },
-        {
-          "GUID": "31a7a8",
-          "Name": "Card",
-          "Transform": {
-            "posX": 46.4921837,
-            "posY": 2.70775151,
-            "posZ": 1.48444772,
-            "rotX": -5.008956E-06,
-            "rotY": 180.0,
-            "rotZ": 180.0,
-            "scaleX": 1.0,
-            "scaleY": 1.0,
-            "scaleZ": 1.0
-          },
-          "Nickname": "",
-          "Description": "",
-          "GMNotes": "",
-          "AltLookAngle": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "ColorDiffuse": {
-            "r": 0.713235259,
-            "g": 0.713235259,
-            "b": 0.713235259
-          },
-          "LayoutGroupSortIndex": 0,
-          "Value": 0,
-          "Locked": false,
-          "Grid": true,
-          "Snap": true,
-          "IgnoreFoW": false,
-          "MeasureMovement": false,
-          "DragSelectable": true,
-          "Autoraise": true,
-          "Sticky": true,
-          "Tooltip": true,
-          "GridProjection": false,
-          "Hands": true,
-          "CardID": 6903,
-          "SidewaysCard": false,
-          "LuaScript": "",
-          "LuaScriptState": "",
-          "XmlUI": "",
-          "ContainedObjects": []
         }
       ]
     },
@@ -12979,7 +12787,7 @@
         "posX": 30.5822983,
         "posY": 1.76055408,
         "posZ": -8.168707,
-        "rotX": -8.254454E-06,
+        "rotX": -8.302441E-06,
         "rotY": 180.0,
         "rotZ": 180.0,
         "scaleX": 1.0,
@@ -13031,8 +12839,8 @@
       ],
       "CustomDeck": {
         "70": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_2_tier_fronts.png?1691959051868",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_2_tier_back.png?1691959050282",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_2_tier_fronts.png?1691974019089",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_2_tier_back.png?1691974017384",
           "NumWidth": 5,
           "NumHeight": 3,
           "BackIsHidden": false,
@@ -13664,7 +13472,7 @@
         "posX": 33.3292465,
         "posY": 1.741298,
         "posZ": -8.269782,
-        "rotX": -8.831607E-06,
+        "rotX": -8.539859E-06,
         "rotY": 180.0,
         "rotZ": 180.0,
         "scaleX": 1.0,
@@ -13712,8 +13520,8 @@
       ],
       "CustomDeck": {
         "71": {
-          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_3_tier_fronts.png?1691959050489",
-          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_3_tier_back.png?1691959050201",
+          "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_3_tier_fronts.png?1691974018861",
+          "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/item_3_tier_back.png?1691974017445",
           "NumWidth": 5,
           "NumHeight": 2,
           "BackIsHidden": false,
@@ -14154,12 +13962,12 @@
       "GUID": "1b62c1",
       "Name": "Infinite_Bag",
       "Transform": {
-        "posX": 39.85512,
+        "posX": 38.5313377,
         "posY": 1.66003752,
-        "posZ": 13.355608,
-        "rotX": 1.27795774E-05,
+        "posZ": 12.8850317,
+        "rotX": 7.2400444E-06,
         "rotY": 359.988922,
-        "rotZ": -1.04716514E-06,
+        "rotZ": 1.7676723E-06,
         "scaleX": 1.0,
         "scaleY": 1.0,
         "scaleZ": 1.0
@@ -14239,7 +14047,113 @@
           "HideWhenFaceDown": false,
           "Hands": false,
           "CustomImage": {
-            "ImageURL": "http://cloud-3.steamusercontent.com/ugc/2026109500969647318/9E6C2DB3A0384EE50A221AE783B305C634F42EA1/",
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_cooldown.png?1691974017403",
+            "ImageSecondaryURL": "",
+            "ImageScalar": 1.0,
+            "WidthScale": 0.0,
+            "CustomToken": {
+              "Thickness": 0.2,
+              "MergeDistancePixels": 15.0,
+              "StandUp": false,
+              "Stackable": false
+            }
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        }
+      ]
+    },
+    {
+      "GUID": "4f4a95",
+      "Name": "Infinite_Bag",
+      "Transform": {
+        "posX": 41.5428925,
+        "posY": 1.66003728,
+        "posZ": 13.0333567,
+        "rotX": 6.9624075E-06,
+        "rotY": 0.0005488458,
+        "rotZ": 3.24702432E-06,
+        "scaleX": 1.0,
+        "scaleY": 1.0,
+        "scaleZ": 1.0
+      },
+      "Nickname": "",
+      "Description": "",
+      "GMNotes": "",
+      "AltLookAngle": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "ColorDiffuse": {
+        "r": 0.3058885,
+        "g": 0.372555166,
+        "b": 1.0
+      },
+      "LayoutGroupSortIndex": 0,
+      "Value": 0,
+      "Locked": false,
+      "Grid": true,
+      "Snap": true,
+      "IgnoreFoW": false,
+      "MeasureMovement": false,
+      "DragSelectable": true,
+      "Autoraise": true,
+      "Sticky": true,
+      "Tooltip": true,
+      "GridProjection": false,
+      "HideWhenFaceDown": false,
+      "Hands": false,
+      "MaterialIndex": -1,
+      "MeshIndex": -1,
+      "LuaScript": "",
+      "LuaScriptState": "",
+      "XmlUI": "",
+      "ContainedObjects": [
+        {
+          "GUID": "",
+          "Name": "Custom_Token",
+          "Transform": {
+            "posX": 38.62905,
+            "posY": 3.86292052,
+            "posZ": 10.5649023,
+            "rotX": 0.443787247,
+            "rotY": 0.144209534,
+            "rotZ": 183.952179,
+            "scaleX": 0.2647439,
+            "scaleY": 1.0,
+            "scaleZ": 0.2647439
+          },
+          "Nickname": "token_special",
+          "Description": "",
+          "GMNotes": "",
+          "AltLookAngle": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "ColorDiffuse": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0
+          },
+          "LayoutGroupSortIndex": 0,
+          "Value": 0,
+          "Locked": false,
+          "Grid": true,
+          "Snap": true,
+          "IgnoreFoW": false,
+          "MeasureMovement": false,
+          "DragSelectable": true,
+          "Autoraise": true,
+          "Sticky": true,
+          "Tooltip": true,
+          "GridProjection": false,
+          "HideWhenFaceDown": false,
+          "Hands": false,
+          "CustomImage": {
+            "ImageURL": "https://road-warrior.s3.us-west-2.amazonaws.com/token_special.png?1691974017338",
             "ImageSecondaryURL": "",
             "ImageScalar": 1.0,
             "WidthScale": 0.0,
