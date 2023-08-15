@@ -8,6 +8,13 @@ const s3 = new S3Client({
     credentials: keys
 });
 
+/**
+ *
+ * @param {string} bucket
+ * @param {string} file
+ * @param {string} content_type
+ * @returns {Promise<string>}
+ */
 function upload(bucket, file, content_type) {
     return new Promise((resolve, reject) => {
         const data = fs.readFileSync(file);

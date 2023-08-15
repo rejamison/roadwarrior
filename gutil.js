@@ -91,6 +91,13 @@ async function download(id, auth) {
     }
 }
 
+/**
+ *
+ * @param {string} folderId
+ * @param {string} path
+ * @param {JWT} auth
+ * @returns {Promise<string>}
+ */
 async function upload(folderId, path, auth) {
     try {
         let name = path.lastIndexOf('/') > 0 ? path.slice(path.lastIndexOf('/') + 1) : path;
@@ -133,7 +140,6 @@ async function upload(folderId, path, auth) {
         console.error(err);
     }
 }
-
 
 module.exports = {
     getAuthToken,
