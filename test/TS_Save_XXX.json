@@ -9756,7 +9756,7 @@
         6301,
         6300,
         6303,
-        6304
+        6306
       ],
       "CustomDeck": {
         "63": {
@@ -10161,7 +10161,7 @@
           "Tooltip": true,
           "GridProjection": false,
           "Hands": true,
-          "CardID": 6304,
+          "CardID": 6306,
           "SidewaysCard": false,
           "LuaScript": "",
           "LuaScriptState": "",

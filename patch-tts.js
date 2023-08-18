@@ -139,7 +139,7 @@ function uploadAndUpdateDeck(name, width, cin) {
                         console.log("Adding cards to: " + name);
 
                         while(deck.DeckIDs.length < count) {
-                            let nextId = deck.DeckIDs.length === 0 ? deckId * 100 : deck.DeckIDs[deck.DeckIDs.length - 1] + 1;
+                            let nextId = deck.DeckIDs.reduce((acc, val) => acc > val ? acc : val, 0) + 1;
                             let card = JSON.parse(fs.readFileSync('assets/card.json'));
                             deck.DeckIDs.push(nextId);
                             card.CardID = nextId;
