@@ -7,6 +7,8 @@ const BUCKET = 'road-warrior';
 
 const save = JSON.parse(fs.readFileSync(save_file));
 const stats = JSON.parse(fs.readFileSync('var/stats.json'));
+let offset = 0;
+const NEW_ITEM_OFFSET = 5;
 
 function find(name, nickname) {
     const objs = [];
@@ -67,7 +69,8 @@ function uploadAndUpdateToken(name) {
 
                     const bag = JSON.parse(fs.readFileSync('assets/token.json'));
                     bag.GUID = '';
-                    bag.Transform.posX = 0;
+                    bag.Transform.posX = offset;
+                    offset += NEW_ITEM_OFFSET;
                     bag.Transform.posZ = 0;
 
                     const token = bag.ContainedObjects[0];
@@ -95,48 +98,73 @@ function uploadAndUpdateDeck(name, width, cin) {
         // sanity check that the files exist
         if(fs.existsSync('var/tts/' + name + '_back.png') && fs.existsSync('var/tts/' + name + '_fronts.png')) {
             // sanity check a deck object exists in TTS save
+            let deck = null;
+            let deckId = 0;
             if(find('DeckCustom', name).length > 0) {
-                const deck = find('DeckCustom', name)[0];
-                const deckId = Object.keys(deck.CustomDeck)[0];
-                upload(BUCKET, 'var/tts/' + name + '_back.png', 'image/png').then((url) => {
-                    deck.CustomDeck[deckId].BackURL = url + '?' + Date.now();
+                deck = find('DeckCustom', name)[0];
+                deckId = Object.keys(deck.CustomDeck)[0];
+            } else {
+                // add a deck object
+                deck = JSON.parse(fs.readFileSync('assets/deck.json'));
+                deck.GUID = '';
+                deck.Nickname = name;
+                deck.Transform.posX = offset;
+                offset += NEW_ITEM_OFFSET;
+                deck.Transform.posZ = 0;
 
-                    upload(BUCKET, 'var/tts/' + name + '_fronts.png', 'image/png').then((url) => {
-                        // check if there are the right number of cards in the existing deck
-                        if(deck.DeckIDs.length < count) {
-                            console.log("Adding cards to: " + name);
 
-                            while(deck.DeckIDs.length < count) {
-                                let nextId = deck.DeckIDs[deck.DeckIDs.length - 1] + 1;
-                                let card = JSON.parse(fs.readFileSync('assets/card.json'));
-                                deck.DeckIDs.push(nextId);
-                                card.CardID = nextId;
-                                card.GUID = '';
-                                card.nickname = '';  // TODO: Add card names?
-                                deck.ContainedObjects.push(card);
-                            }
-                        } else if(deck.DeckIDs.length > count) {
-                            console.log("Removing cards from: " + name);
-                            while(deck.DeckIDs.length > count) {
-                                const rem = deck.DeckIDs.pop();
-                                deck.ContainedObjects = deck.ContainedObjects.filter((val) => val.CardID !== rem);
-                            }
+                // find an unused custom deck ID
+                const customDeck = deck.CustomDeck["REPLACE_ME"];
+                delete deck.CustomDeck["REPLACE_ME"];
+                const maxDeckId = save.ObjectStates.reduce((acc, val) => {
+                    if(val.CustomDeck && Object.keys(val.CustomDeck)[0]) {
+                        return parseInt(Object.keys(val.CustomDeck)[0]) > acc ? parseInt(Object.keys(val.CustomDeck)[0]) : acc;
+                    } else {
+                        return acc;
+                    }
+                }, 0);
+                deckId = maxDeckId + 1;
+                deck.CustomDeck['' + deckId] = customDeck;
+                save.ObjectStates.push(deck);
+
+                console.log("Adding deck: " + name);
+            }
+
+            upload(BUCKET, 'var/tts/' + name + '_back.png', 'image/png').then((url) => {
+                deck.CustomDeck[deckId].BackURL = url + '?' + Date.now();
+
+                upload(BUCKET, 'var/tts/' + name + '_fronts.png', 'image/png').then((url) => {
+                    // check if there are the right number of cards in the existing deck
+                    if(deck.DeckIDs.length < count) {
+                        console.log("Adding cards to: " + name);
+
+                        while(deck.DeckIDs.length < count) {
+                            let nextId = deck.DeckIDs.length === 0 ? deckId * 100 : deck.DeckIDs[deck.DeckIDs.length - 1] + 1;
+                            let card = JSON.parse(fs.readFileSync('assets/card.json'));
+                            deck.DeckIDs.push(nextId);
+                            card.CardID = nextId;
+                            card.GUID = '';
+                            card.nickname = '';  // TODO: Add card names?
+                            deck.ContainedObjects.push(card);
                         }
+                    } else if(deck.DeckIDs.length > count) {
+                        console.log("Removing cards from: " + name);
+                        while(deck.DeckIDs.length > count) {
+                            const rem = deck.DeckIDs.pop();
+                            deck.ContainedObjects = deck.ContainedObjects.filter((val) => val.CardID !== rem);
+                        }
+                    }
 
-                        deck.CustomDeck[deckId].FaceURL = url + '?' + Date.now();
-                        deck.CustomDeck[deckId].NumWidth = width;
-                        deck.CustomDeck[deckId].NumHeight = height;
-                        resolve();
-                    }).catch((err) => {
-                        reject(err);
-                    });
+                    deck.CustomDeck[deckId].FaceURL = url + '?' + Date.now();
+                    deck.CustomDeck[deckId].NumWidth = width;
+                    deck.CustomDeck[deckId].NumHeight = height;
+                    resolve();
                 }).catch((err) => {
                     reject(err);
                 });
-            } else {
-                console.error("ERROR: Couldn't find deck object in TTS save for: " + name);
-                reject(new Error("ERROR: Couldn't find deck object in TTS save for: " + name));
-            }
+            }).catch((err) => {
+                reject(err);
+            });
         } else {
             console.error("ERROR:  Couldn't find PNG files for: " + name);
             reject(new Error("ERROR:  Couldn't find PNG files for: " + name));

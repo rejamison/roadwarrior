@@ -900,6 +900,9 @@ async function main() {
                     ai_cards.push(card);
                 }
             }
+            while((ai_cards.length) > 0 && (ai_cards.length < 6)) {
+                ai_cards.push(...ai_cards);
+            }
             let ai_sheet = new Cardistry.Sheet(ai_cards);
             exportScaledAndUpload(ai_sheet, 'var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);

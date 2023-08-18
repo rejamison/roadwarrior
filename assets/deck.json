@@ -2,15 +2,15 @@
   "GUID": "REPLACE_ME",
   "Name": "DeckCustom",
   "Transform": {
-    "posX": 48.7407455,
-    "posY": 1.71722507,
-    "posZ": 8.427075,
-    "rotX": -0.000009212414,
-    "rotY": 179.983536,
+    "posX": 0.0,
+    "posY": 3.0,
+    "posZ": 0.0,
+    "rotX": -0.0,
+    "rotY": 180.0,
     "rotZ": 180,
-    "scaleX": 1.99495173,
+    "scaleX": 1.53204679,
     "scaleY": 1,
-    "scaleZ": 1.99495173
+    "scaleZ": 1.53204679
   },
   "Nickname": "REPLACE_ME",
   "Description": "",
