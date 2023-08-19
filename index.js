@@ -14,7 +14,7 @@ const COLORS = {
     'black': '000000',
     'green': '71D358',
     'orange': 'FF824A',
-    'purple': 'C462DD',
+    'purple': '800080',
     'red': 'FF001C',
     'yellow': 'FFD65B',
     'grey': 'D3D3D3',
@@ -25,9 +25,10 @@ const COLORS = {
     'dark_grey': '888888',
     'dark_gray': '888888',
     'white': 'FFFFFF',
-    'olive': 'AFB42B',
+    'olive': '808000',
     'brown': '795548',
-    'teal': '00ACC1'
+    'teal': '00ACC1',
+    'tan': 'D2B48C',
 };
 const FONTS = {
     'rokkitt': 'Rokkitt',

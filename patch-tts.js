@@ -34,18 +34,31 @@ function uploadAndUpdateDie(name) {
         // sanity check that the files exist
         if(fs.existsSync('var/tts/' + name + '.png')) {
             // sanity check a deck object exists in TTS save
-            if(find('Custom_Dice', name).length > 0) {
-                const die = find('Custom_Dice', name)[0];
-                upload(BUCKET, 'var/tts/' + name + '.png', 'image/png').then((url) => {
+            upload(BUCKET, 'var/tts/' + name + '.png', 'image/png').then((url) => {
+                if(find('Custom_Dice', name).length > 0) {
+                    const die = find('Custom_Dice', name)[0];
                     die.CustomImage.ImageURL = url + '?' + Date.now();
                     resolve();
-                }).catch((err) => {
-                    reject(err);
-                });
-            } else {
-                console.error("ERROR: Couldn't find die object in TTS save for: " + name);
-                reject(new Error("ERROR: Couldn't find die object in TTS save for: " + name));
-            }
+                } else {
+                    // add a new token object to the save
+                    console.log("Adding die: " + name);
+
+                    const bag = JSON.parse(fs.readFileSync('assets/die.json'));
+                    bag.GUID = '';
+                    bag.Transform.posX = offset;
+                    offset += NEW_ITEM_OFFSET;
+                    bag.Transform.posZ = 0;
+
+                    const die = bag.ContainedObjects[0];
+                    die.GUID = '';
+                    die.Nickname = name;
+                    die.CustomImage.ImageURL = url + '?' + Date.now();
+                    save.ObjectStates.push(bag);
+                    resolve();
+                }
+            }).catch((err) => {
+                reject(err);
+            });
         } else {
             console.error("ERROR:  Couldn't find PNG files for: " + name);
             reject(new Error("ERROR:  Couldn't find PNG files for: " + name));
