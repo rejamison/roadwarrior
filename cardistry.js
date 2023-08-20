@@ -17,11 +17,18 @@ const H_ALIGN = {
 }
 exports.H_ALIGN = H_ALIGN;
 
+/**
+ * @class BoundaryRect
+ */
 class BoundaryRect {
     constructor(x, y, w, h) {
+        /** @type {number} */
         this.x = x;
+        /** @type {number} */
         this.y = y;
+        /** @type {number} */
         this.w = w;
+        /** @type {number} */
         this.h = h;
     }
 
@@ -114,28 +121,102 @@ class BoundaryRect {
 exports.BoundaryRect = BoundaryRect;
 
 /**
- * @class Card
- * @param {string} bgColor
+ * @class Font
  */
+class TextStyle {
+    /** @type {string} */
+    font
+    /** @type {number} */
+    size
+    /** @type {string} */
+    color
+    /** @type {string} */
+    hAlign
+    /** @type {string} */
+    vAlign
+
+    /**
+     *
+     * @param {string} font
+     * @param {number} size
+     * @param {string} color
+     * @param {string} hAlign
+     * @param {string} vAlign
+     */
+    constructor(font, sizePx, color, hAlign, vAlign) {
+        this.font = font;
+        this.size = sizePx;
+        this.color = color;
+        this.hAlign = hAlign;
+        this.vAlign = vAlign;
+    }
+
+    /**
+     * @param {CanvasRenderingContext2D} ctx
+     */
+    setCtx(ctx) {
+        ctx.font = this.size + 'px ' + this.font;
+        ctx.fillStyle = '#' + this.color;
+    }
+
+    /**
+     *
+     * @param {number} pct
+     * @returns {TextStyle}
+     */
+    scale(pct) {
+        return new TextStyle(this.font, this.size * pct, this.color, this.hAlign, this.vAlign);
+    }
+
+    /**
+     *
+     * @param {string} hAlign
+     * @param {string} vAlign
+     * @returns {TextStyle}
+     */
+    realign(hAlign, vAlign) {
+        return new TextStyle(this.font, this.size, this.color, hAlign, vAlign);
+    }
+
+    /**
+     *
+     * @param {string} font
+     * @returns {TextStyle}
+     */
+    refont(font) {
+        return new TextStyle(font, this.size, this.color, this.hAlign, this.vAlign);
+    }
+
+    /**
+     *
+     * @param {string} color
+     * @returns {TextStyle}
+     */
+    recolor(color) {
+        return new TextStyle(this.font, this.size, color, this.hAlign, this.vAlign);
+    }
+}
+exports.TextStyle = TextStyle;
+
 class Card {
-    height
-    width
-    bleed
-    safe
-    extra
-    margin
     /** @type {string} */
     bgColor
-    dpi
 
     constructor(width, height, bleed, safe, extra, bgColor, dpi) {
+        /** @type {number} */
         this.height = height;
+        /** @type {number} */
         this.width = width;
+        /** @type {number} */
         this.bleed = bleed;
+        /** @type {number} */
         this.safe = safe;
+        /** @type {number} */
         this.extra = extra;
+        /** @type {number} */
         this.margin = this.bleed + this.safe + this.extra;
         this.bgColor = bgColor;
+        /** @type {number} */
         this.dpi = dpi;
         this.elements = [];
 
@@ -235,13 +316,20 @@ class Card {
 exports.Card = Card;
 
 class CardElement {
-    /** @type Card */
+    /** @type {Card} */
     parent
+    /** @type {BoundaryRect} */
+    boundRect
 
+    /**
+     *
+     * @param {Card} parent
+     * @param {BoundaryRect} boundRect
+     */
     constructor(parent, boundRect) {
         this.parent = parent;
         if(!boundRect) {
-            this.boundRect = parent.getDrawableBoundRect();
+            this.boundRect = this.parent.getDrawableBoundRect();
         } else {
             this.boundRect = boundRect;
         }
@@ -326,26 +414,29 @@ class ImageBox extends Box {
 exports.ImageBox = ImageBox;
 
 class TextBox extends CardElement {
-    constructor(parent, text, font, color, size, margin, align, baseline, boundRect, bgColor) {
+    text
+    /** @type {TextStyle} */
+    margin
+    /** @type {BoundaryRect} */
+    bgColor
+    /** @type {Array<Mutator>} [mutators] */
+    mutators
+
+    constructor(parent, text, style, margin, boundRect, bgColor, mutators) {
         super(parent, boundRect);
 
         this.text = text;
-        this.font = font;
-        this.color = color;
-        this.size = size;
         this.margin = margin;
-        this.sizePx = parent.getSizeInPx(this.size);
+        this.style = style;
         this.marginPx = parent.getSizeInPx(this.margin);
-        this.align = align;
-        this.baseline = baseline;
         this.ctx = parent.ctx;
+        this.mutators = mutators ? mutators : [];
         this.bgColor = bgColor;
 
         this.ctx.save();
 
-        this.ctx.font = this.sizePx + 'px ' + this.font;
-        this.ctx.fillStyle = '#' + this.color;
-        this.ctx.textAlign = 'left';  // over-ridding so we can manage internally
+        this.style.setCtx(this.ctx);
+        this.ctx.textAlign = 'left';  // xover-ridding so we can manage internally
         this.ctx.textBaseline = 'alphabetic';  // over-ridding so we can manage internally
         this.fontHeight = this.ctx.measureText('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').actualBoundingBoxAscent;
         this.spaceSize = this.ctx.measureText(' ').width * 0.6;
@@ -355,6 +446,7 @@ class TextBox extends CardElement {
         this.lineSpacePx = this.fontHeight * 0.9;
         this.lines = [];
         let idx = 0;
+
         this.blocks.forEach(block => {
             this.lines.push({
                 chunks: [],
@@ -364,11 +456,13 @@ class TextBox extends CardElement {
             this.chunks = [];
             this.words = block.split(' ');
             this.words.forEach(word => {
-                const m = this.ctx.measureText(word);
+                const m = this.mutators.reduce((acc, m) => m.test(word) ? m : acc, new Mutator());
+                const mm = m.measure(word, this.style, this.ctx);
                 let chunk = {
                     word: word,
-                    width: m.width,
-                    height: m.actualBoundingBoxAscent
+                    width: mm.w,
+                    height: mm.h,
+                    mutator: m
                 };
                 this.chunks.push(chunk);
             });
@@ -404,55 +498,43 @@ class TextBox extends CardElement {
     }
 
     draw() {
+        this.ctx.save();
         if(this.bgColor) {
-            this.ctx.save();
             this.ctx.fillStyle = '#' + this.bgColor;
             const b = this.getTextBoundRect();
             this.ctx.fillRect(b.x, b.y, b.w, b.h);
-            this.ctx.restore();
         }
-        this.drawWithHighlightedWords([], this.color);
-    }
 
-    drawWithHighlightedWords(fillerWords, highlightColor) {
-        this.ctx.save();
-
-        this.ctx.font = this.sizePx + 'px ' + this.font;
-        this.ctx.fillStyle = '#' + this.color;
+        this.style.setCtx(this.ctx);
         this.ctx.textAlign = 'left';  // over-ridding so we can manage internally
         this.ctx.textBaseline = 'alphabetic';  // over-ridding so we can manage internally
 
         // draw the text
         this.ctx.fillStyle = '#' + this.color;
         let x, y;
-        if(this.baseline === V_ALIGN.middle) {
+        if(this.style.vAlign === V_ALIGN.middle) {
             y = this.boundRect.y + (this.boundRect.h / 2) - (this.hpx / 2) + this.marginPx;
-        } else if(this.baseline === V_ALIGN.top) {
+        } else if(this.style.vAlign === V_ALIGN.top) {
             y = this.boundRect.y + this.marginPx;
-        } else if(this.baseline === V_ALIGN.bottom) {
+        } else if(this.style.vAlign === V_ALIGN.bottom) {
             y = this.boundRect.y + this.boundRect.h - this.hpx + this.marginPx;
         } else {
-            console.log("WARNING: UNRECOGNIZED BASELINE VALUE: " + this.baseline);
+            console.log("WARNING: UNRECOGNIZED V-ALIGN VALUE: " + this.style.vAlign);
             y = this.boundRect.y + this.marginPx;
         }
         this.lines.forEach(line => {
-            if(this.align === H_ALIGN.left) {
+            if(this.style.hAlign === H_ALIGN.left) {
                 x = this.boundRect.x + this.marginPx;
-            } else if(this.align === H_ALIGN.right) {
+            } else if(this.style.hAlign === H_ALIGN.right) {
                 x = this.boundRect.x + this.boundRect.w - this.marginPx - line.width;
-            } else if(this.align === H_ALIGN.center) {
+            } else if(this.style.hAlign === H_ALIGN.center) {
                 x = this.boundRect.x + (this.boundRect.w / 2) - (line.width / 2);
             } else {
-                console.log("WARNING: UNRECOGNIZED ALIGN VALUE: " + this.align);
+                console.log("WARNING: UNRECOGNIZED ALIGN VALUE: " + this.style.hAlign);
                 x = this.boundRect.x + this.marginPx;
             }
             line.chunks.forEach(chunk => {
-                if(fillerWords.includes(chunk.word.toLowerCase())) {
-                    this.ctx.fillStyle = '#' + highlightColor;
-                } else {
-                    this.ctx.fillStyle = '#' + this.color;
-                }
-                this.ctx.fillText(chunk.word, x, y + this.fontHeight);
+                chunk.mutator.mutate(chunk.word, this.style, this.ctx, new BoundaryRect(x, y, chunk.width, chunk.height));
 
                 x += chunk.width + this.spaceSize;
             });
@@ -464,16 +546,16 @@ class TextBox extends CardElement {
 
     getTextBoundRect() {
         let x, y;
-        if(this.align === H_ALIGN.center) {
+        if(this.style.hAlign === H_ALIGN.center) {
             x = this.boundRect.x + this.boundRect.w / 2 - this.wpx / 2;
-        } else if(this.align === H_ALIGN.right) {
+        } else if(this.style.hAlign === H_ALIGN.right) {
             x = this.boundRect.x + this.boundRect.w - this.wpx;
         } else {
             x = this.boundRect.x;
         }
-        if(this.baseline === V_ALIGN.middle) {
+        if(this.style.vAlign === V_ALIGN.middle) {
             y = this.boundRect.y + this.boundRect.h / 2 - this.hpx / 2;
-        } else if(this.baseline === V_ALIGN.top || this.baseline === 'hanging') {
+        } else if(this.style.vAlign === V_ALIGN.top || this.style.vAlign === 'hanging') {
             y = this.boundRect.y;
         } else {
             y = this.boundRect.y + this.boundRect.h - this.hpx;
@@ -485,8 +567,8 @@ class TextBox extends CardElement {
 exports.TextBox = TextBox;
 
 class RotatedTextBox extends TextBox {
-    constructor(parent, text, font, color, size, margin, align, baseline, boundRect, bgColor, rotation) {
-        super(parent, text, font, color, size, margin, align, baseline, boundRect, bgColor);
+    constructor(parent, style, margin, boundRect, bgColor, rotation) {
+        super(parent, style, margin, boundRect, bgColor);
 
         this.rotation = rotation;
     }
@@ -507,19 +589,100 @@ class RotatedTextBox extends TextBox {
 }
 exports.RotatedTextBox = RotatedTextBox;
 
-class HighlightedTextBox extends TextBox {
-    constructor(parent, text, font, color, size, margin, align, baseline, fillerWords, highlightColor, boundRect) {
-        super(parent, text, font, color, size, margin, align, baseline, boundRect);
+class Mutator {
+    constructor() {
 
-        this.fillerWords = fillerWords;
-        this.highlightColor = highlightColor;
     }
 
-    draw() {
-        this.drawWithHighlightedWords(this.fillerWords, this.highlightColor);
+    /**
+     *
+     * @param str
+     * @returns {boolean}
+     */
+    test(str) {
+        return true;
+    }
+
+    /**
+     *
+     * @param {string} str
+     * @param {TextStyle} style
+     * @param {CanvasRenderingContext2D} ctx
+     * @returns {{w: number, h: number}}
+     */
+    measure(str, style, ctx) {
+        ctx.save();
+        style.setCtx(ctx);
+        let m = ctx.measureText(str);
+        ctx.restore();
+        return {
+            w: m.width,
+            h: m.actualBoundingBoxAscent
+        };
+    }
+
+    /**
+     *
+     * @param str
+     * @param {TextStyle} style
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {BoundaryRect} boundRect
+     */
+    mutate(str, style, ctx, boundRect) {
+        ctx.save();
+        ctx.fillText(str, boundRect.x, boundRect.y + style.size, boundRect.w);
+        ctx.restore();
     }
 }
-exports.HighlightedTextBox = HighlightedTextBox;
+exports.Mutator = Mutator;
+
+class WordHighlighter extends Mutator {
+    /** @type {TextStyle} */
+    style
+    /** @type {Array<string>} */
+    wordsToHighlight
+
+    /**
+     *
+     * @param {Array<string>} wordsToHighlight
+     * @param {TextStyle} style
+     */
+    constructor(wordsToHighlight, style) {
+        super();
+
+        this.wordsToHighlight = wordsToHighlight;
+        this.style = style;
+    }
+
+    test(str) {
+        return this.wordsToHighlight.includes(str);
+    }
+
+    measure(str, style, ctx) {
+        ctx.save();
+        this.style.setCtx(ctx);
+        let m = ctx.measureText(str);
+        ctx.restore();
+        return {
+            w: m.width,
+            h: m.actualBoundingBoxAscent
+        };
+    }
+
+    /**
+     *
+     * @param {string} str
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {BoundaryRect} boundRect
+     */
+    mutate(str, style, ctx, boundRect) {
+        ctx.save();
+        this.style.setCtx(ctx);
+        ctx.fillText(str, boundRect.x, boundRect.y + style.size, boundRect.w);
+        ctx.restore();
+    }
+}
+exports.WordHighlighter = WordHighlighter;
 
 class GridCard extends Card {
     constructor(width, height, bleed, safe, extra, bgColor, dpi, cellSize, cellMargin, cellPalette) {
@@ -852,14 +1015,10 @@ class ImageManager {
         }
     }
 
-    _isDark(color) {
-        return color && (((parseInt(color.slice(0,2), 16) + parseInt(color.slice(2,4), 16) + parseInt(color.slice(4,6), 16)) / 3) < 128);
-    }
-
     getInverted(key, colorIfDark, colorIfLight, bgColor) {
         let img = this.get(key);
         if(img) {
-            if(this._isDark(bgColor)) {
+            if(isDark(bgColor)) {
                 return this.getRecolored(key, colorIfDark);
             } else {
                 return this.getRecolored(key, colorIfLight);
@@ -872,3 +1031,8 @@ class ImageManager {
     }
 }
 exports.ImageManager = ImageManager;
+
+function isDark(color) {
+    return color && (((parseInt(color.slice(0,2), 16) + parseInt(color.slice(2,4), 16) + parseInt(color.slice(4,6), 16)) / 3) < 128);
+}
+exports.isDark = isDark;

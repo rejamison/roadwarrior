@@ -2,13 +2,14 @@ const cvs = require("canvas");
 const fs = require("fs");
 const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
-const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager} = require("./cardistry");
+const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager, WordHighlighter, TextStyle, isDark} = require("./cardistry");
 const {Canvas, loadImage} = require("canvas");
 const {getAuthToken, getSheet, getSheetValues, download, upload} = require('./gutil');
 
 const SHEET_ID = '13Of7uumH7h1DKWzTMfgaTGnJmjlnC7CSuH2TnDdxsiI';
 const ASSET_FOLDER_ID = '1_c-ZMmwW4eUmKRfLA66aiWfX6qoMu_Ez';
 
+// constants
 const COLORS = {
     'blue': '00449F',
     'black': '000000',
@@ -30,31 +31,6 @@ const COLORS = {
     'teal': '00ACC1',
     'tan': 'D2B48C',
 };
-const FONTS = {
-    'rokkitt': 'Rokkitt',
-    'rokkitt_bold': 'Rokkitt Bold',
-    'rokkitt_light': 'Rokkitt Light'
-}
-
-// setup the randomizer
-rnd.seed(Date.now().toString());
-// rnd.seed('1673045739034');
-console.log('initializing with seed ' + rnd.getSeedString());
-
-// register fonts
-cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: FONTS.rokkitt_bold});
-cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONTS.rokkitt_light});
-
-// load images
-const im = new ImageManager();
-
-// create needed directories
-if(!fs.existsSync('var')) fs.mkdirSync('var');
-if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
-if(!fs.existsSync('var/tts')) fs.mkdirSync('var/tts');
-if(!fs.existsSync('var/pnp')) fs.mkdirSync('var/pnp');
-
-// constants
 const CARD_BLEED = 0.125;
 const CARD_SAFE = 0.125;
 const CARD_HEIGHT = 2.48 + CARD_BLEED * 2;
@@ -66,6 +42,38 @@ const DEFAULT_TEXT_MARGIN = DEFAULT_TEXT_SIZE * 0.23;
 const DEFAULT_DPI = 300;
 const D6_WIDTH = 0.5;
 const D6_HEIGHT = 0.5;
+const FONT_TYPES = {
+    'rokkitt': 'Rokkitt',
+    'rokkitt_bold': 'Rokkitt Bold',
+    'rokkitt_light': 'Rokkitt Light'
+}
+const STYLES = {
+    fullBack: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'center', 'middle'),
+    header: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
+    body: new TextStyle(FONT_TYPES.rokkitt, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
+    bodyBold: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
+}
+
+
+// setup the randomizer
+rnd.seed(Date.now().toString());
+// rnd.seed('1673045739034');
+console.log('initializing with seed ' + rnd.getSeedString());
+
+// register fonts
+cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: FONT_TYPES.rokkitt_bold});
+cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONT_TYPES.rokkitt_light});
+
+// load images
+const im = new ImageManager();
+
+// create needed directories
+if(!fs.existsSync('var')) fs.mkdirSync('var');
+if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
+if(!fs.existsSync('var/tts')) fs.mkdirSync('var/tts');
+if(!fs.existsSync('var/pnp')) fs.mkdirSync('var/pnp');
+
+
 
 // globals
 let dice = {};
@@ -227,6 +235,12 @@ function decksByFields(deck, field1, field2) {
     return decks;
 }
 
+class RoadWarriorKeywordHighlighter extends WordHighlighter {
+    constructor(style) {
+        super(['Passenger'], style);
+    }
+}
+
 class RoadWarriorCardBack extends Cardistry.Card {
     deckName
     deckImage
@@ -239,18 +253,16 @@ class RoadWarriorCardBack extends Cardistry.Card {
         this.deckImage = iconImage;
         this.textColor = textColor;
 
+
         if(this.deckImage) {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                FONTS.rokkitt_bold,
-                this.textColor,
-                DEFAULT_TEXT_SIZE,
+                STYLES.fullBack.recolor(isDark(this.bgColor) ? COLORS.white : COLORS.black),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect().cutTopPct(0.5),
-                this.bgColor));
+                this.bgColor
+            ));
             this.addElement(new Cardistry.ImageBox(
                 this,
                 this.getDrawableBoundRect().cutBottomPct(0.5),
@@ -262,12 +274,8 @@ class RoadWarriorCardBack extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                FONTS.rokkitt_bold,
-                this.textColor,
-                DEFAULT_TEXT_SIZE * 1.75,
+                STYLES.fullBack.scale(1.75),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect(),
                 this.bgColor));
         }
@@ -287,23 +295,15 @@ class RoadWarriorRuleCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.ruleName,
-            FONTS.rokkitt_bold,
-            this.textColor,
-            DEFAULT_TEXT_SIZE * 0.55,
+            STYLES.header.scale(0.55),
             0,
-            'left',
-            'top',
             this.getDrawableBoundRect().cutPct(0, 0, 0, 0.9),
             this.bgColor));
         this.addElement(new Cardistry.TextBox(
             this,
             this.ruleText,
-            FONTS.rokkitt,
-            this.textColor,
-            DEFAULT_TEXT_SIZE * 0.4,
+            STYLES.body.scale(0.4),
             0,
-            'left',
-            'top',
             this.getDrawableBoundRect().cutPct(0, 0, 0.1, 0),
             this.bgColor));
     }
@@ -340,12 +340,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            FONTS.rokkitt_bold,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.75,
+            STYLES.header.scale(0.75),
             0,
-            'left',
-            'top',
             this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
         if(this.attackCostImages.length > 0) {
@@ -366,24 +362,17 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackEffectText,
-                FONTS.rokkitt,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 0.55,
+                STYLES.body.scale(0.55).realign('left', 'middle'),
                 0,
-                'left',
-                'middle',
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
-                attackBoxBgColor
+                attackBoxBgColor,
+                [new RoadWarriorKeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle'))]
             ));
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackRange,
-                FONTS.rokkitt_bold,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 0.5,
+                STYLES.bodyBold.scale(0.5).realign('center', 'middle'),
                 0,
-                'center',
-                'middle',
                 attackBoxRect.cutPct(0, 0.66, 0.8, 0),
                 attackBoxBgColor
             ));
@@ -391,14 +380,11 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.body,
-                FONTS.rokkitt,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 0.7,
+                STYLES.body.scale(0.7).realign('left', 'middle'),
                 0,
-                'left',
-                'middle',
                 this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
-                this.bgColor
+                this.bgColor,
+                [new RoadWarriorKeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle'))]
             ));
         }
         if(this.slotsImage) {
@@ -434,12 +420,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                FONTS.rokkitt_bold,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 0.75,
+                STYLES.bodyBold.scale(0.75).realign('center', 'middle'),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
                 this.bgColor
             ));
@@ -471,12 +453,8 @@ class RoadWarriorAICard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            FONTS.rokkitt_bold,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.75,
+            STYLES.header.scale(0.75),
             0,
-            'left',
-            'top',
             this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
         this.addElement(new Cardistry.ImageBox(
@@ -488,12 +466,8 @@ class RoadWarriorAICard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.body,
-            FONTS.rokkitt,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.65,
+            STYLES.body.scale(0.65).realign('left', 'middle'),
             0,
-            'left',
-            'middle',
             this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
             this.bgColor
         ));
@@ -545,24 +519,16 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.faction + '\n' + this.name,
-            FONTS.rokkitt_bold,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE * 1.2,
+            STYLES.bodyBold.scale(1.2).realign('center', 'middle'),
             0,
-            'center',
-            'middle',
             this.getDrawableBoundRect().shrink(100),
             this.bgColor));
         if(this.toughness) {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.toughness + '+',
-                FONTS.rokkitt_bold,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 1.1,
+                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect().cutPct(0.85, 0, 0, 0.7),
                 this.bgColor
             ));
@@ -571,12 +537,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.quantity + 'X',
-                FONTS.rokkitt_bold,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 1.1,
+                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect().cutPct(0, 0.85, 0.7, 0),
                 this.bgColor
             ));
@@ -599,12 +561,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                FONTS.rokkitt_bold,
-                COLORS.black,
-                DEFAULT_TEXT_SIZE * 1.1,
+                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
                 0,
-                'center',
-                'middle',
                 this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
                 this.bgColor
             ));
@@ -658,7 +616,6 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         const fudgeRect = mapRect.cut(13, 6, 65, 67);
         let h = fudgeRect.h / 10;
         let w = fudgeRect.w / 14;
-//        this.addElement(new Cardistry.Box(this, fudgeRect, COLORS.red));
         for(let enemy of this.enemies) {
             let vehicle = vehicles[enemy.tag];
             let x = enemy.x * w + fudgeRect.x + (((enemy.y + 1) % 2) * (w / 2));
@@ -681,24 +638,16 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.factionText + '\n' + this.nameText,
-            FONTS.rokkitt_bold,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE,
+            STYLES.header.realign('left', 'bottom'),
             0,
-            'left',
-            'bottom',
             this.getDrawableBoundRect().cutPct(0, 0, 0.9, 0),
             this.bgColor
         ));
         this.addElement(new Cardistry.TextBox(
             this,
             'Rewards:\n' + this.rewardText,
-            FONTS.rokkitt_bold,
-            COLORS.black,
-            DEFAULT_TEXT_SIZE * 0.8,
+            STYLES.body.scale(0.8).realign('right', 'bottom'),
             0,
-            'right',
-            'bottom',
             this.getDrawableBoundRect().cutPct(0.8, 0, 0.5, 0),
             this.bgColor
         ));
