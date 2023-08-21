@@ -590,9 +590,7 @@ class RotatedTextBox extends TextBox {
 exports.RotatedTextBox = RotatedTextBox;
 
 class Mutator {
-    constructor() {
-
-    }
+    constructor() { }
 
     /**
      *

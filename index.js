@@ -2,7 +2,7 @@ const cvs = require("canvas");
 const fs = require("fs");
 const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
-const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager, WordHighlighter, TextStyle, isDark} = require("./cardistry");
+const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager, WordHighlighter, TextStyle, isDark, Mutator} = require("./cardistry");
 const {Canvas, loadImage} = require("canvas");
 const {getAuthToken, getSheet, getSheetValues, download, upload} = require('./gutil');
 
@@ -235,9 +235,41 @@ function decksByFields(deck, field1, field2) {
     return decks;
 }
 
-class RoadWarriorKeywordHighlighter extends WordHighlighter {
+class KeywordHighlighter extends WordHighlighter {
     constructor(style) {
         super(['Passenger'], style);
+    }
+}
+
+class RangeGlyph extends Mutator {
+    constructor() {
+        super();
+    }
+
+    test(str) {
+      return /range\([0-9]+\)/.test(str.toLowerCase());
+    }
+
+    measure(str, style, ctx) {
+        const match = str.toLowerCase().match(/range\(([0-9]+)\)/);
+        const range = parseInt(match[1]);
+        return {
+            w: style.size * range,
+            h: style.size
+        }
+    }
+    
+    mutate(str, style, ctx, boundRect) {
+        const rangeIcon = im.getRecolored('hex', style.color);
+        const match = str.toLowerCase().match(/range\(([0-9]+)\)/);
+        const range = parseInt(match[1]);
+        
+        ctx.save();
+        for(let i = 0; i < range; i++) {
+            // NOTE: nudging image down to line up better with text...
+            ctx.drawImage(rangeIcon, boundRect.x + (style.size * i), boundRect.y + (style.size * 0.2), style.size, style.size);
+        }
+        ctx.restore();
     }
 }
 
@@ -366,7 +398,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 0,
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
                 attackBoxBgColor,
-                [new RoadWarriorKeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle'))]
+                [new KeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle'))]
             ));
             this.addElement(new Cardistry.TextBox(
                 this,
@@ -374,7 +406,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 STYLES.bodyBold.scale(0.5).realign('center', 'middle'),
                 0,
                 attackBoxRect.cutPct(0, 0.66, 0.8, 0),
-                attackBoxBgColor
+                attackBoxBgColor,
+                [new RangeGlyph()]
             ));
         } else {
             this.addElement(new Cardistry.TextBox(
@@ -384,7 +417,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 0,
                 this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
                 this.bgColor,
-                [new RoadWarriorKeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle'))]
+                [new KeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle'))]
             ));
         }
         if(this.slotsImage) {
@@ -469,7 +502,8 @@ class RoadWarriorAICard extends Cardistry.Card {
             STYLES.body.scale(0.65).realign('left', 'middle'),
             0,
             this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
-            this.bgColor
+            this.bgColor,
+            [new RangeGlyph()]
         ));
         if(this.chainImage) {
             this.addElement(new Cardistry.ImageBox(
