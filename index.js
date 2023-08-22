@@ -45,7 +45,8 @@ const D6_HEIGHT = 0.5;
 const FONT_TYPES = {
     'rokkitt': 'Rokkitt',
     'rokkitt_bold': 'Rokkitt Bold',
-    'rokkitt_light': 'Rokkitt Light'
+    'rokkitt_light': 'Rokkitt Light',
+    'archivo': 'Archivo'
 }
 const STYLES = {
     fullBack: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'center', 'middle'),
@@ -63,6 +64,7 @@ console.log('initializing with seed ' + rnd.getSeedString());
 // register fonts
 cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: FONT_TYPES.rokkitt_bold});
 cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONT_TYPES.rokkitt_light});
+cvs.registerFont('lib/Archivo_Black/ArchivoBlack-Regular.ttf', {family: FONT_TYPES.archivo});
 
 // load images
 const im = new ImageManager();
@@ -72,8 +74,6 @@ if(!fs.existsSync('var')) fs.mkdirSync('var');
 if(!fs.existsSync('tmp')) fs.mkdirSync('tmp');
 if(!fs.existsSync('var/tts')) fs.mkdirSync('var/tts');
 if(!fs.existsSync('var/pnp')) fs.mkdirSync('var/pnp');
-
-
 
 // globals
 let dice = {};
@@ -267,8 +267,60 @@ class RangeGlyph extends Mutator {
         ctx.save();
         for(let i = 0; i < range; i++) {
             // NOTE: nudging image down to line up better with text...
-            ctx.drawImage(rangeIcon, boundRect.x + (style.size * i), boundRect.y + (style.size * 0.2), style.size, style.size);
+            ctx.drawImage(rangeIcon, boundRect.x + (style.size * i), boundRect.y + (style.size * 0.15), style.size, style.size);
         }
+        ctx.restore();
+    }
+}
+
+class ActionGlyph extends Mutator {
+    action
+    color
+    /** @type {RegExp} */
+    re
+
+    constructor(action, color) {
+        super();
+
+        this.action = action;
+        this.color = color;
+        this.re = new RegExp(this.action.toLowerCase() + '\\(([0-9x\\-\\>]+)\\),?');
+    }
+
+    test(str) {
+        return this.re.test(str.toLowerCase());
+    }
+
+    measure(str, style, ctx) {
+        const match = str.toLowerCase().match(this.re);
+        const attackValue = match[1];
+
+        ctx.save();
+        style.refont(FONT_TYPES.archivo).scale(0.8).setCtx(ctx);
+        let mLabel = ctx.measureText(this.action.toUpperCase());
+        let mNum = ctx.measureText(attackValue.toUpperCase());
+        ctx.restore();
+        return {
+            w: mLabel.width + mNum.width + (style.size * 0.2) + (style.size * 0.2),
+            h: mLabel.actualBoundingBoxAscent
+        };
+    }
+
+    mutate(str, style, ctx, boundRect) {
+        const match = str.toLowerCase().match(this.re);
+        const attackValue = match[1];
+
+        ctx.save();
+        ctx.fillStyle = '#' + this.color;
+        ctx.beginPath();
+        ctx.roundRect(boundRect.x, boundRect.y + (style.size * 0.2), boundRect.w, boundRect.h * 1.6, style.size * 0.2);
+        ctx.fill();
+        style.refont(FONT_TYPES.archivo).scale(0.7).recolor(COLORS.white).setCtx(ctx);
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'left';
+        ctx.fillText(this.action.toUpperCase(), boundRect.x + (style.size * 0.2), boundRect.y + boundRect.h * 1.15, boundRect.w);
+        ctx.textAlign = 'right';
+        ctx.fillText(attackValue.toUpperCase(), boundRect.x + boundRect.w - (style.size * 0.2), boundRect.y + boundRect.h * 1.15, boundRect.w);
         ctx.restore();
     }
 }
@@ -398,7 +450,21 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 0,
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
                 attackBoxBgColor,
-                [new KeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle'))]
+                [
+                    new KeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle')),
+                    new RangeGlyph(),
+                    new ActionGlyph("Attack", COLORS.red),
+                    new ActionGlyph("Move", COLORS.black),
+                    new ActionGlyph("Fire", COLORS.orange),
+                    new ActionGlyph("Delay", COLORS.green),
+                    new ActionGlyph("Grapple", COLORS.green),
+                    new ActionGlyph("Board", COLORS.green),
+                    new ActionGlyph("Disable", COLORS.green),
+                    new ActionGlyph("Cooldown", COLORS.blue),
+                    new ActionGlyph("Push", COLORS.dark_gray),
+                    new ActionGlyph("Pull", COLORS.dark_gray),
+                    new ActionGlyph("Sentry", COLORS.black),
+                ]
             ));
             this.addElement(new Cardistry.TextBox(
                 this,
@@ -417,7 +483,21 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 0,
                 this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
                 this.bgColor,
-                [new KeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle'))]
+                [
+                    new KeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle')),
+                    new RangeGlyph(),
+                    new ActionGlyph("Attack", COLORS.red),
+                    new ActionGlyph("Move", COLORS.black),
+                    new ActionGlyph("Fire", COLORS.orange),
+                    new ActionGlyph("Delay", COLORS.green),
+                    new ActionGlyph("Grapple", COLORS.green),
+                    new ActionGlyph("Board", COLORS.green),
+                    new ActionGlyph("Disable", COLORS.green),
+                    new ActionGlyph("Cooldown", COLORS.blue),
+                    new ActionGlyph("Push", COLORS.dark_gray),
+                    new ActionGlyph("Pull", COLORS.dark_gray),
+                    new ActionGlyph("Sentry", COLORS.black),
+                ]
             ));
         }
         if(this.slotsImage) {
@@ -503,7 +583,20 @@ class RoadWarriorAICard extends Cardistry.Card {
             0,
             this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
             this.bgColor,
-            [new RangeGlyph()]
+            [
+                new RangeGlyph(),
+                new ActionGlyph("Attack", COLORS.red),
+                new ActionGlyph("Move", COLORS.black),
+                new ActionGlyph("Fire", COLORS.orange),
+                new ActionGlyph("Delay", COLORS.green),
+                new ActionGlyph("Grapple", COLORS.green),
+                new ActionGlyph("Board", COLORS.green),
+                new ActionGlyph("Disable", COLORS.green),
+                new ActionGlyph("Cooldown", COLORS.blue),
+                new ActionGlyph("Push", COLORS.dark_gray),
+                new ActionGlyph("Pull", COLORS.dark_gray),
+                new ActionGlyph("Sentry", COLORS.black),
+            ]
         ));
         if(this.chainImage) {
             this.addElement(new Cardistry.ImageBox(

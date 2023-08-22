@@ -461,7 +461,7 @@ class TextBox extends CardElement {
                 let chunk = {
                     word: word,
                     width: mm.w,
-                    height: mm.h,
+                    height: this.fontHeight,
                     mutator: m
                 };
                 this.chunks.push(chunk);
