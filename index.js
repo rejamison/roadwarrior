@@ -273,6 +273,35 @@ class RangeGlyph extends Mutator {
     }
 }
 
+class SymbolGlyph extends Mutator {
+    constructor() {
+        super();
+    }
+
+    test(str) {
+        return /\{[a-z]+}/.test(str.toLowerCase());
+    }
+
+    measure(str, style, ctx) {
+        return {
+            w: style.size,
+            h: style.size
+        }
+    }
+
+    mutate(str, style, ctx, boundRect) {
+        const match = str.toLowerCase().match(/\{([a-z]+)}/);
+        const key = match[1];
+        const icon = im.getRecolored(key, style.color);
+        if(icon) {
+            ctx.save();
+            // NOTE: nudging image down to line up better with text...
+            ctx.drawImage(icon, boundRect.x, boundRect.y + (style.size * 0.15), style.size, style.size);
+            ctx.restore();
+        }
+    }
+}
+
 class ActionGlyph extends Mutator {
     action
     color
@@ -296,12 +325,12 @@ class ActionGlyph extends Mutator {
         const attackValue = match[1];
 
         ctx.save();
-        style.refont(FONT_TYPES.archivo).scale(0.8).setCtx(ctx);
+        style.refont(FONT_TYPES.archivo).scale(0.7).setCtx(ctx);
         let mLabel = ctx.measureText(this.action.toUpperCase());
         let mNum = ctx.measureText(attackValue.toUpperCase());
         ctx.restore();
         return {
-            w: mLabel.width + mNum.width + (style.size * 0.2) + (style.size * 0.2),
+            w: mLabel.width + mNum.width + (style.size * 0.8),
             h: mLabel.actualBoundingBoxAscent
         };
     }
@@ -324,6 +353,25 @@ class ActionGlyph extends Mutator {
         ctx.restore();
     }
 }
+
+const GLYPHS = [
+    new RangeGlyph(),
+    new SymbolGlyph(),
+    new ActionGlyph("Attack", COLORS.red),
+    new ActionGlyph("Damage", COLORS.red),
+    new ActionGlyph("Move", COLORS.black),
+    new ActionGlyph("Fire", COLORS.orange),
+    new ActionGlyph("Delay", COLORS.green),
+    new ActionGlyph("Grapple", COLORS.green),
+    new ActionGlyph("Board", COLORS.green),
+    new ActionGlyph("Disable", COLORS.green),
+    new ActionGlyph("Repair", COLORS.green),
+    new ActionGlyph("Cooldown", COLORS.blue),
+    new ActionGlyph("Push", COLORS.dark_gray),
+    new ActionGlyph("Pull", COLORS.dark_gray),
+    new ActionGlyph("Jump", COLORS.dark_gray),
+    new ActionGlyph("Sentry", COLORS.black),
+]
 
 class RoadWarriorCardBack extends Cardistry.Card {
     deckName
@@ -452,18 +500,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 attackBoxBgColor,
                 [
                     new KeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle')),
-                    new RangeGlyph(),
-                    new ActionGlyph("Attack", COLORS.red),
-                    new ActionGlyph("Move", COLORS.black),
-                    new ActionGlyph("Fire", COLORS.orange),
-                    new ActionGlyph("Delay", COLORS.green),
-                    new ActionGlyph("Grapple", COLORS.green),
-                    new ActionGlyph("Board", COLORS.green),
-                    new ActionGlyph("Disable", COLORS.green),
-                    new ActionGlyph("Cooldown", COLORS.blue),
-                    new ActionGlyph("Push", COLORS.dark_gray),
-                    new ActionGlyph("Pull", COLORS.dark_gray),
-                    new ActionGlyph("Sentry", COLORS.black),
+                    ...GLYPHS,
                 ]
             ));
             this.addElement(new Cardistry.TextBox(
@@ -485,18 +522,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 this.bgColor,
                 [
                     new KeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle')),
-                    new RangeGlyph(),
-                    new ActionGlyph("Attack", COLORS.red),
-                    new ActionGlyph("Move", COLORS.black),
-                    new ActionGlyph("Fire", COLORS.orange),
-                    new ActionGlyph("Delay", COLORS.green),
-                    new ActionGlyph("Grapple", COLORS.green),
-                    new ActionGlyph("Board", COLORS.green),
-                    new ActionGlyph("Disable", COLORS.green),
-                    new ActionGlyph("Cooldown", COLORS.blue),
-                    new ActionGlyph("Push", COLORS.dark_gray),
-                    new ActionGlyph("Pull", COLORS.dark_gray),
-                    new ActionGlyph("Sentry", COLORS.black),
+                    ...GLYPHS,
                 ]
             ));
         }
@@ -535,8 +561,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 '' + hp,
                 STYLES.bodyBold.scale(0.75).realign('center', 'middle'),
                 0,
-                this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
-                this.bgColor
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0.85, 0),
+                null
             ));
         }
     }
@@ -584,18 +610,7 @@ class RoadWarriorAICard extends Cardistry.Card {
             this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
             this.bgColor,
             [
-                new RangeGlyph(),
-                new ActionGlyph("Attack", COLORS.red),
-                new ActionGlyph("Move", COLORS.black),
-                new ActionGlyph("Fire", COLORS.orange),
-                new ActionGlyph("Delay", COLORS.green),
-                new ActionGlyph("Grapple", COLORS.green),
-                new ActionGlyph("Board", COLORS.green),
-                new ActionGlyph("Disable", COLORS.green),
-                new ActionGlyph("Cooldown", COLORS.blue),
-                new ActionGlyph("Push", COLORS.dark_gray),
-                new ActionGlyph("Pull", COLORS.dark_gray),
-                new ActionGlyph("Sentry", COLORS.black),
+                ...GLYPHS,
             ]
         ));
         if(this.chainImage) {
@@ -690,8 +705,8 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
                 '' + hp,
                 STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
                 0,
-                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
-                this.bgColor
+                this.getDrawableBoundRect().cutPct(0.85, 0, 0.58, 0),
+                null
             ));
         }
     }
