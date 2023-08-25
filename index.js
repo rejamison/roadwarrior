@@ -641,30 +641,49 @@ class RoadWarriorAICard extends Cardistry.Card {
 class RoadWarriorInitiativeCard extends Cardistry.Card {
     faction
     name
+    specialRules
     vehicleIconImage
     hp
     color
     toughness
     quantity
 
-    constructor(faction, name, vehicleIcon, hp, color, toughness, quantity) {
+    constructor(faction, name, specialRules, vehicleIcon, hp, color, toughness, quantity) {
         super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.faction = faction;
         this.name = name;
+        this.specialRules = specialRules;
         this.vehicleIconImage = im.get(vehicleIcon);
         this.hp = someOrNone(hp);
         this.color = someOrNone(color);
         this.toughness = someOrNone(toughness);
         this.quantity = someOrNone(quantity);
 
-        this.addElement(new Cardistry.TextBox(
-            this,
-            this.faction + '\n' + this.name,
-            STYLES.bodyBold.scale(1.2).realign('center', 'middle'),
-            0,
-            this.getDrawableBoundRect().shrink(100),
-            this.bgColor));
+        if(this.specialRules) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.faction + '\n' + this.name,
+                STYLES.bodyBold.scale(0.9).realign('center', 'middle'),
+                0,
+                this.getDrawableBoundRect().shrink(50).cutBottomPct(0.5),
+                this.bgColor));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.specialRules,
+                STYLES.bodyBold.scale(0.6).realign('center', 'middle'),
+                0,
+                this.getDrawableBoundRect().shrink(50).cutTopPct(0.5),
+                this.bgColor));
+        } else {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.faction + '\n' + this.name,
+                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
+                0,
+                this.getDrawableBoundRect().shrink(50),
+                this.bgColor));
+        }
         if(this.toughness) {
             this.addElement(new Cardistry.TextBox(
                 this,
@@ -957,6 +976,7 @@ async function main() {
             let card = new RoadWarriorInitiativeCard(
                 vehicle['Faction'],
                 vehicle['Name Text'],
+                vehicle['Special Rules'],
                 vehicle['Vehicle Icon'],
                 vehicle['HP'],
                 vehicle['Color'],
