@@ -117,6 +117,14 @@ class BoundaryRect {
         let cutb = this.h * bp;
         return new BoundaryRect(this.x + cutl, this.y + cutt, this.w - cutl - cutr, this.h - cutt - cutb);
     }
+
+    pastePct(lp, rp, tp, bp) {
+        let pastel = this.w * lp;
+        let paster = this.w * rp;
+        let pastet = this.h * tp;
+        let pasteb = this.h * bp;
+        return new BoundaryRect(this.x - pastel, this.y - pastet, this.w + pastel + paster, this.h + pastet + pasteb);
+    }
 }
 exports.BoundaryRect = BoundaryRect;
 
@@ -441,6 +449,10 @@ class TextBox extends CardElement {
         this.fontHeight = this.ctx.measureText('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz').actualBoundingBoxAscent;
         this.spaceSize = this.ctx.measureText(' ').width * 0.6;
 
+        this.mutators.forEach((m) => {
+            this.text = m.preoprocess(this.text);
+        });
+
         // generate chunks of text
         this.blocks = this.text.split('\n');
         this.lineSpacePx = this.fontHeight * 0.9;
@@ -461,7 +473,7 @@ class TextBox extends CardElement {
                 let chunk = {
                     word: word,
                     width: mm.w,
-                    height: this.fontHeight,
+                    height: mm.h,
                     mutator: m
                 };
                 this.chunks.push(chunk);
@@ -595,6 +607,15 @@ class Mutator {
     /**
      *
      * @param str
+     * @returns {string}
+     */
+    preoprocess(str) {
+        return str;
+    }
+
+    /**
+     *
+     * @param str
      * @returns {boolean}
      */
     test(str) {
@@ -628,7 +649,8 @@ class Mutator {
      */
     mutate(str, style, ctx, boundRect) {
         ctx.save();
-        ctx.fillText(str, boundRect.x, boundRect.y + style.size, boundRect.w);
+        style.setCtx(ctx);
+        ctx.fillText(str, boundRect.x, boundRect.y + style.size * 0.62, boundRect.w);
         ctx.restore();
     }
 }
@@ -637,29 +659,34 @@ exports.Mutator = Mutator;
 class WordHighlighter extends Mutator {
     /** @type {TextStyle} */
     style
-    /** @type {Array<string>} */
-    wordsToHighlight
+    /** @type {string} */
+    wordToHighlight
 
     /**
      *
      * @param {Array<string>} wordsToHighlight
      * @param {TextStyle} style
      */
-    constructor(wordsToHighlight, style) {
+    constructor(wordToHighlight, style) {
         super();
 
-        this.wordsToHighlight = wordsToHighlight;
+        this.wordToHighlight = wordToHighlight;
         this.style = style;
+        this.replacementToken = Math.trunc(Math.random() * 1000000000).toString();
+    }
+
+    preoprocess(str) {
+        return str.replace(this.wordToHighlight, this.replacementToken);
     }
 
     test(str) {
-        return this.wordsToHighlight.includes(str);
+        return str.includes(this.replacementToken);
     }
 
     measure(str, style, ctx) {
         ctx.save();
         this.style.setCtx(ctx);
-        let m = ctx.measureText(str);
+        let m = ctx.measureText(str.replace(this.replacementToken, this.wordToHighlight));
         ctx.restore();
         return {
             w: m.width,
@@ -676,7 +703,7 @@ class WordHighlighter extends Mutator {
     mutate(str, style, ctx, boundRect) {
         ctx.save();
         this.style.setCtx(ctx);
-        ctx.fillText(str, boundRect.x, boundRect.y + style.size, boundRect.w);
+        ctx.fillText(str.replace(this.replacementToken, this.wordToHighlight), boundRect.x, boundRect.y + style.size * 0.62, boundRect.w);
         ctx.restore();
     }
 }

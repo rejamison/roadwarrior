@@ -236,10 +236,13 @@ function decksByFields(deck, field1, field2) {
 }
 
 class KeywordHighlighter extends WordHighlighter {
-    constructor(style) {
-        super(['Passenger'], style);
+    constructor(keyword, style) {
+        super(keyword, style);
     }
 }
+
+const glyphVerticalScaleFactor = 1.25;
+const glyphVerticalMoveFactor = ((glyphVerticalScaleFactor - 1) / 2) / glyphVerticalScaleFactor;
 
 class RangeGlyph extends Mutator {
     constructor() {
@@ -254,8 +257,8 @@ class RangeGlyph extends Mutator {
         const match = str.toLowerCase().match(/range\(([0-9]+)\)/);
         const range = parseInt(match[1]);
         return {
-            w: style.size * range,
-            h: style.size
+            w: style.size * 0.62 * range * glyphVerticalScaleFactor,
+            h: style.size * 0.62 * glyphVerticalScaleFactor,
         }
     }
     
@@ -263,11 +266,11 @@ class RangeGlyph extends Mutator {
         const rangeIcon = im.getRecolored('hex', style.color);
         const match = str.toLowerCase().match(/range\(([0-9]+)\)/);
         const range = parseInt(match[1]);
-        
+        const br = boundRect.move(0, -boundRect.h * glyphVerticalMoveFactor);
+
         ctx.save();
         for(let i = 0; i < range; i++) {
-            // NOTE: nudging image down to line up better with text...
-            ctx.drawImage(rangeIcon, boundRect.x + (style.size * i), boundRect.y + (style.size * 0.15), style.size, style.size);
+            ctx.drawImage(rangeIcon, br.x + (br.w / range * i), br.y, br.w / range, br.h);
         }
         ctx.restore();
     }
@@ -284,8 +287,8 @@ class SymbolGlyph extends Mutator {
 
     measure(str, style, ctx) {
         return {
-            w: style.size,
-            h: style.size
+            w: style.size * 0.62 * glyphVerticalScaleFactor,
+            h: style.size * 0.62 * glyphVerticalScaleFactor,
         }
     }
 
@@ -293,10 +296,10 @@ class SymbolGlyph extends Mutator {
         const match = str.toLowerCase().match(/\{([a-z]+)}/);
         const key = match[1];
         const icon = im.getRecolored(key, style.color);
+        const br = boundRect.move(0, -boundRect.h * glyphVerticalMoveFactor);
         if(icon) {
             ctx.save();
-            // NOTE: nudging image down to line up better with text...
-            ctx.drawImage(icon, boundRect.x, boundRect.y + (style.size * 0.15), style.size, style.size);
+            ctx.drawImage(icon, br.x, br.y, br.h, br.h);
             ctx.restore();
         }
     }
@@ -331,25 +334,27 @@ class ActionGlyph extends Mutator {
         ctx.restore();
         return {
             w: mLabel.width + mNum.width + (style.size * 0.8),
-            h: mLabel.actualBoundingBoxAscent
+            h: style.size * 0.62 * glyphVerticalScaleFactor,
         };
     }
 
     mutate(str, style, ctx, boundRect) {
         const match = str.toLowerCase().match(this.re);
         const attackValue = match[1];
+        const margin = style.size * 0.2;
+        const br = boundRect.move(0, -boundRect.h * glyphVerticalMoveFactor);
 
         ctx.save();
         ctx.fillStyle = '#' + this.color;
         ctx.beginPath();
-        ctx.roundRect(boundRect.x, boundRect.y + (style.size * 0.2), boundRect.w, boundRect.h * 1.6, style.size * 0.2);
+        ctx.roundRect(br.x, br.y, br.w, br.h, margin);
         ctx.fill();
         style.refont(FONT_TYPES.archivo).scale(0.7).recolor(COLORS.white).setCtx(ctx);
-        ctx.textBaseline = 'middle';
         ctx.textAlign = 'left';
-        ctx.fillText(this.action.toUpperCase(), boundRect.x + (style.size * 0.2), boundRect.y + boundRect.h * 1.15, boundRect.w);
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.action.toUpperCase(), br.x + margin, br.y + (br.h / 2), br.w);
         ctx.textAlign = 'right';
-        ctx.fillText(attackValue.toUpperCase(), boundRect.x + boundRect.w - (style.size * 0.2), boundRect.y + boundRect.h * 1.15, boundRect.w);
+        ctx.fillText(attackValue.toUpperCase(), br.x + br.w - margin, br.y + (br.h / 2), br.w);
         ctx.restore();
     }
 }
@@ -366,6 +371,7 @@ const GLYPHS = [
     new ActionGlyph("Board", COLORS.green),
     new ActionGlyph("Disable", COLORS.green),
     new ActionGlyph("Repair", COLORS.green),
+    new ActionGlyph("Drop", COLORS.green),
     new ActionGlyph("Cooldown", COLORS.blue),
     new ActionGlyph("Push", COLORS.dark_gray),
     new ActionGlyph("Pull", COLORS.dark_gray),
@@ -499,7 +505,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
                 attackBoxBgColor,
                 [
-                    new KeywordHighlighter(STYLES.bodyBold.scale(0.55).realign('left', 'middle')),
+                    new KeywordHighlighter('Passenger', STYLES.bodyBold.scale(0.55).realign('left', 'middle')),
+                    new KeywordHighlighter('Spin Out', STYLES.bodyBold.scale(0.55).realign('left', 'middle')),
                     ...GLYPHS,
                 ]
             ));
@@ -521,7 +528,8 @@ class RoadWarriorItemCard extends Cardistry.Card {
                 this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.1),
                 this.bgColor,
                 [
-                    new KeywordHighlighter(STYLES.bodyBold.scale(0.7).realign('left', 'middle')),
+                    new KeywordHighlighter('Passenger', STYLES.bodyBold.scale(0.7).realign('left', 'middle')),
+                    new KeywordHighlighter('Spin Out', STYLES.bodyBold.scale(0.7).realign('left', 'middle')),
                     ...GLYPHS,
                 ]
             ));
@@ -559,9 +567,9 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                STYLES.bodyBold.scale(0.75).realign('center', 'middle'),
+                STYLES.bodyBold.scale(0.7).realign('center', 'middle'),
                 0,
-                this.getDrawableBoundRect().cutPct(0.8, 0, 0.85, 0),
+                this.getDrawableBoundRect().cutPct(0.8, 0, 0.9, 0),
                 null
             ));
         }
@@ -610,6 +618,7 @@ class RoadWarriorAICard extends Cardistry.Card {
             this.getDrawableBoundRect().cutPct(0, 0, 0.45, 0),
             this.bgColor,
             [
+                new KeywordHighlighter('Spin Out', STYLES.bodyBold.scale(0.65).realign('left', 'middle')),
                 ...GLYPHS,
             ]
         ));
@@ -722,9 +731,9 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 '' + hp,
-                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
+                STYLES.bodyBold.scale(1).realign('center', 'middle'),
                 0,
-                this.getDrawableBoundRect().cutPct(0.85, 0, 0.58, 0),
+                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
                 null
             ));
         }
