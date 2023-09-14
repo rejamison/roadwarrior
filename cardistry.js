@@ -1022,6 +1022,7 @@ class ImageManager {
     }
 
     get(key) {
+        if(key && !this.images.get(key)) console.warn("WARNING: Can't find image with key: " + key);
         return this.images.get(key);
     }
 

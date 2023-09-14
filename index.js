@@ -30,6 +30,7 @@ const COLORS = {
     'brown': '795548',
     'teal': '00ACC1',
     'tan': 'D2B48C',
+    'dark_brown': '3C1B10',
 };
 const CARD_BLEED = 0.125;
 const CARD_SAFE = 0.125;
@@ -756,7 +757,7 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         this.nameText = name;
         this.playerPosX = playerPos.split(',')[0] - 1;
         this.playerPosY = playerPos.split(',')[1] - 1;
-        this.enemies = enemies.split('\n').map((value) => {
+        this.enemies = enemies.trim().split('\n').map((value) => {
             const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
             const result = re.exec(value);
             let enemy = {
@@ -771,39 +772,63 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
                 console.error("ERROR: Bad tag in scenario: " + enemy.tag);
             }
         });
+        this.statsText = '';
         this.rewardText = rewards;
         this.tierText = tier;
 
 
-        const mapRect = this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.1);
+        const mapRect = this.getDrawableBoundRect().cutPct(0, 0.3, 0, 0.15);
+        const fudgeRect = mapRect.cutPct(0, 0, 0.055, 0.055);
+        // this.addElement(new Cardistry.Box(
+        //     this,
+        //     fudgeRect,
+        //     COLORS.grey
+        // ));
+        let h = fudgeRect.h / 7;
+        let w = fudgeRect.w / 15;
+        let vehiclesFound = {};
+        for(let enemy of this.enemies) {
+            let vehicle = vehicles[enemy.tag];
+            let x = enemy.x * w + fudgeRect.x;
+            let y = enemy.y * h + fudgeRect.y;
+            this.addElement(new Cardistry.Box(
+                this,
+                new BoundaryRect(x, y, w, h),
+                COLORS[vehicle['Color']]
+            ));
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                new BoundaryRect(x, y, w, h).shrinkPct(0.1),
+                null,
+                im.getRecolored(vehicle['Vehicle Icon'], COLORS.white),
+                false
+            ));
+            if(!vehiclesFound[vehicle['Name Text']]) {
+                this.statsText += vehicle['Name Text'] + '\nHP: ' + vehicle['HP'] + ' | ' + vehicle['Tough.'] + '+\n\n';
+                vehiclesFound[vehicle['Name Text']] = true;
+            }
+        }
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            new BoundaryRect(this.playerPosX * w + fudgeRect.x, this.playerPosY * h + fudgeRect.y, w, h).shrinkPct(0.1),
+            null,
+            im.get('special'),
+            false
+        ));
         this.addElement(new Cardistry.ImageBox(
             this,
             mapRect,
             null,
-            im.get('map'),
+            im.get('grid'),
             false
         ));
-        const fudgeRect = mapRect.cut(13, 6, 65, 67);
-        let h = fudgeRect.h / 10;
-        let w = fudgeRect.w / 14;
-        for(let enemy of this.enemies) {
-            let vehicle = vehicles[enemy.tag];
-            let x = enemy.x * w + fudgeRect.x + (((enemy.y + 1) % 2) * (w / 2));
-            let y = enemy.y * h + fudgeRect.y;
-            this.addElement(new Cardistry.ImageBox(
-                this,
-                new BoundaryRect(x, y, h, w).shrinkPct(0.1),
-                null,
-                im.getRecolored(vehicle['Vehicle Icon'], COLORS[vehicle['Color']]),
-                false
-            ));
-        }
-        this.addElement(new Cardistry.ImageBox(
+        this.addElement(new Cardistry.TextBox(
             this,
-            new BoundaryRect(this.playerPosX * w + fudgeRect.x + (((this.playerPosY + 1) % 2) * (w / 2)), this.playerPosY * h + fudgeRect.y, w, h).shrinkPct(0.1),
-            null,
-            im.get('special'),
-            false
+            this.statsText,
+            STYLES.body.scale(0.9).realign('right', 'top'),
+            0,
+            this.getDrawableBoundRect().cutPct(0.7, 0, 0, 0.5),
+            this.bgColor
         ));
         this.addElement(new Cardistry.TextBox(
             this,
@@ -816,9 +841,9 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             'Rewards:\n' + this.rewardText,
-            STYLES.body.scale(0.8).realign('right', 'bottom'),
+            STYLES.body.scale(0.9).realign('right', 'bottom'),
             0,
-            this.getDrawableBoundRect().cutPct(0.8, 0, 0.5, 0),
+            this.getDrawableBoundRect().cutPct(0.7, 0, 0.5, 0),
             this.bgColor
         ));
     }
@@ -892,6 +917,15 @@ async function loadSheet() {
         // load all the items
         const items_response = await getSheetValues(SHEET_ID, 'Items', auth);
         items = decksByFields(rowsToObjects(items_response.data.values), 'Tier');
+        Object.values(items).forEach((deck) => {
+            Object.values(deck).forEach((card) => {
+                // check/repair data
+                if(!card.Qty) {
+                    card.Qty = 1;
+                    console.error("ERROR: Bad quantity, setting to 1: " + card.Tag);
+                }
+            });
+        });
 
         // load all the vehicles
         const vehicles_response = await getSheetValues(SHEET_ID, 'Vehicles', auth);
