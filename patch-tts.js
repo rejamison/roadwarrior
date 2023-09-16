@@ -125,7 +125,6 @@ function uploadAndUpdateDeck(name, width, cin) {
                 offset += NEW_ITEM_OFFSET;
                 deck.Transform.posZ = 0;
 
-
                 // find an unused custom deck ID
                 const customDeck = deck.CustomDeck["REPLACE_ME"];
                 delete deck.CustomDeck["REPLACE_ME"];
@@ -152,7 +151,7 @@ function uploadAndUpdateDeck(name, width, cin) {
                         console.log("Adding cards to: " + name);
 
                         while(deck.DeckIDs.length < count) {
-                            let nextId = deck.DeckIDs.reduce((acc, val) => acc > val ? acc : val, deckId * 100) + 1;
+                            let nextId = deck.DeckIDs.reduce((acc, val) => acc > val ? acc : val, deckId * 100 - 1) + 1;
                             let card = JSON.parse(fs.readFileSync('assets/card.json'));
                             deck.DeckIDs.push(nextId);
                             card.CardID = nextId;

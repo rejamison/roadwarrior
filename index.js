@@ -191,6 +191,37 @@ function addImagesRow(parent, images, boundaryRect, bgColor, stretch, hAlign, vA
 
 /**
  *
+ * @param {Cardistry.Card} parent
+ * @param {Canvas|Image[]} images
+ * @param {BoundaryRect} boundaryRect
+ * @param {string} [bgColor]
+ * @param {boolean} [stretch]
+ * @param {string} [vAlign]
+ * @param {string} [hAlign]
+ */
+function addImagesColumn(parent, images, boundaryRect, bgColor, stretch, hAlign, vAlign) {
+    if(images && images.length > 0) {
+        for(let i = 0; i < images.length; i++) {
+            let image = images[i];
+            if(image) {
+                parent.addElement(new Cardistry.ImageBox(
+                    parent,
+                    boundaryRect.cutPct(0, 0, (1 / images.length) * i, (1 / images.length) * (images.length - i - 1)),
+                    bgColor ? bgColor : parent.bgColor,
+                    image,
+                    false,
+                    hAlign,
+                    vAlign
+                ));
+            } else {
+                console.error('Missing image...');
+            }
+        }
+    }
+}
+
+/**
+ *
  * @param {string} str
  * @returns {string|null}
  */
@@ -664,80 +695,94 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
         this.faction = faction;
         this.name = name;
         this.specialRules = specialRules;
-        this.vehicleIconImage = im.get(vehicleIcon);
+        this.vehicleIconImage = im.getRecolored(vehicleIcon, COLORS.white);
         this.hp = someOrNone(hp);
         this.color = someOrNone(color);
         this.toughness = someOrNone(toughness);
         this.quantity = someOrNone(quantity);
 
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.faction,
+            STYLES.bodyBold.scale(1.85).realign('right', 'top'),
+            0,
+            this.getDrawableBoundRect().cutPct(0, 0, 0, 0.66),
+            this.bgColor));
         if(this.specialRules) {
             this.addElement(new Cardistry.TextBox(
                 this,
-                this.faction + '\n' + this.name,
-                STYLES.bodyBold.scale(0.9).realign('center', 'middle'),
-                0,
-                this.getDrawableBoundRect().shrink(50).cutBottomPct(0.5),
-                this.bgColor));
-            this.addElement(new Cardistry.TextBox(
-                this,
                 this.specialRules,
-                STYLES.bodyBold.scale(0.6).realign('center', 'middle'),
+                STYLES.body.scale(0.8).realign('right', 'top'),
                 0,
-                this.getDrawableBoundRect().shrink(50).cutTopPct(0.5),
+                this.getDrawableBoundRect().cutPct(0, 0, 0.25, 0.33),
                 this.bgColor));
-        } else {
-            this.addElement(new Cardistry.TextBox(
-                this,
-                this.faction + '\n' + this.name,
-                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
-                0,
-                this.getDrawableBoundRect().shrink(50),
-                this.bgColor));
-        }
-        if(this.toughness) {
-            this.addElement(new Cardistry.TextBox(
-                this,
-                this.toughness + '+',
-                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
-                0,
-                this.getDrawableBoundRect().cutPct(0.85, 0, 0, 0.7),
-                this.bgColor
-            ));
-        }
-        if(this.quantity) {
-            this.addElement(new Cardistry.TextBox(
-                this,
-                this.quantity + 'X',
-                STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
-                0,
-                this.getDrawableBoundRect().cutPct(0, 0.85, 0.7, 0),
-                this.bgColor
-            ));
         }
         if(this.color) {
             this.addElement(new Cardistry.Box(
                 this,
-                this.getDrawableBoundRect().cutPct(0, 0.85, 0, 0.7),
+                this.getFullBoundRect().cutPct(0, 0, 0.55, 0),
                 COLORS[this.color]
             ));
         }
-        if(this.hp) {
-            this.addElement(new Cardistry.ImageBox(
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.name,
+            STYLES.bodyBold.scale(1.1).realign('right', 'bottom').recolor(COLORS.white),
+            0,
+            this.getDrawableBoundRect().cutPct(0.5, 0, 0.66 + 0.05, 0),
+            COLORS[this.color]));
+        // if(this.toughness) {
+        //     this.addElement(new Cardistry.TextBox(
+        //         this,
+        //         this.toughness + '+',
+        //         STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
+        //         0,
+        //         this.getDrawableBoundRect().cutPct(0.85, 0, 0, 0.7),
+        //         this.bgColor
+        //     ));
+        // }
+        if(this.vehicleIconImage) {
+            let images = [];
+            for(let i = 0; i < this.quantity; i++) {
+                images.push(this.vehicleIconImage);
+            }
+            addImagesRow(
                 this,
-                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
-                this.bgColor,
-                im.get('shield'),
-                false
-            ));
-            this.addElement(new Cardistry.TextBox(
-                this,
-                '' + hp,
-                STYLES.bodyBold.scale(1).realign('center', 'middle'),
-                0,
-                this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
-                null
-            ));
+                images,
+                this.getDrawableBoundRect().cutPct(0, 0.5, 0.66, 0),
+                COLORS[this.color],
+                false,
+                'left',
+                'center'
+            );
         }
+        // if(this.quantity) {
+        //     this.addElement(new Cardistry.TextBox(
+        //         this,
+        //         this.quantity + 'X',
+        //         STYLES.bodyBold.scale(1.1).realign('center', 'middle'),
+        //         0,
+        //         this.getDrawableBoundRect().cutPct(0, 0.85, 0.7, 0),
+        //         this.bgColor
+        //     ));
+        // }
+        // if(this.hp) {
+        //     this.addElement(new Cardistry.ImageBox(
+        //         this,
+        //         this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
+        //         this.bgColor,
+        //         im.get('shield'),
+        //         false
+        //     ));
+        //     this.addElement(new Cardistry.TextBox(
+        //         this,
+        //         '' + hp,
+        //         STYLES.bodyBold.scale(1).realign('center', 'middle'),
+        //         0,
+        //         this.getDrawableBoundRect().cutPct(0.85, 0, 0.7, 0),
+        //         null
+        //     ));
+        // }
     }
 }
 
