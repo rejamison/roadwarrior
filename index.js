@@ -1128,6 +1128,7 @@ async function main() {
         for(let deckName in scenarios) {
             let deck = scenarios[deckName];
             let scenario_cards = [];
+            let scenario_card_backs = [];
             for(let scenario of Object.values(deck)) {
                 let card = new RoadWarriorScenarioCard(
                     scenario['Faction'],
@@ -1139,16 +1140,27 @@ async function main() {
                 );
                 card.draw();
                 scenario_cards.push(card);
+
+                let scenario_back = new RoadWarriorCardBack(
+                    deckName + ' Scenario\n' + scenario['Faction'],
+                    null,
+                    COLORS.dark_gray,
+                    COLORS.white,
+                    true
+                );
+                scenario_back.draw();
+                scenario_card_backs.push(scenario_back);
             }
             while((scenario_cards.length) > 0 && (scenario_cards.length < 4)) {
                 scenario_cards.push(...scenario_cards);
+                scenario_card_backs.push(...scenario_card_backs);
             }
             let scenario_sheet = new Cardistry.Sheet(scenario_cards);
             exportScaledAndUpload(scenario_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, false);
             scenario_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_fronts.png', 3, 1, true, true);
-            let scenario_back = new RoadWarriorCardBack(deckName + ' Scenario', null, COLORS.dark_gray, COLORS.white, true);
-            scenario_back.draw();
-            exportAndUpload(scenario_back, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png');
+            let scenario_back_sheet = new Cardistry.Sheet(scenario_card_backs);
+            exportScaledAndUpload(scenario_back_sheet, 'var/tts/scenario_' + convertToFilename(deckName) + '_back.png', 3, 1, true, false);
+            scenario_back_sheet.exportScaledPNG('var/pnp/scenario_' + convertToFilename(deckName) + '_back.png', 3, 1, true, true);
         }
 
         let rule_cards = [];
