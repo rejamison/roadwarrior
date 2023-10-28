@@ -103,6 +103,54 @@ function uploadAndUpdateToken(name) {
     });
 }
 
+function uploadAndUpdatePlayerMat() {
+    return new Promise((resolve, reject) => {
+        // sanity check that the files exist
+        if(fs.existsSync('assets/playermat.png')) {
+            // sanity check a deck object exists in TTS save
+            const token = find('Custom_Tile', 'playermat')[0];
+            upload(BUCKET, 'assets/playermat.png', 'image/png').then((url) => {
+                if(find('Custom_Tile', 'playermat').length > 0) {
+                    token.CustomImage.ImageURL = url + '?' + Date.now();
+                    resolve();
+                } else {
+                    console.error("ERROR:  Couldn't find playermat TTS object");
+                    reject(new Error("ERROR:  Couldn't find playermat TTS object"));
+                }
+            }).catch((err) => {
+                reject(err);
+            });
+        } else {
+            console.error("ERROR:  Couldn't find PNG files for player aids.");
+            reject(new Error("ERROR:  Couldn't find PNG files for player aids."));
+        }
+    });
+}
+
+function uploadAndUpdateRoundTracker() {
+    return new Promise((resolve, reject) => {
+        // sanity check that the files exist
+        if(fs.existsSync('assets/roundtracker.png')) {
+            // sanity check a deck object exists in TTS save
+            const token = find('Custom_Tile', 'roundtracker')[0];
+            upload(BUCKET, 'assets/roundtracker.png', 'image/png').then((url) => {
+                if(find('Custom_Tile', 'roundtracker').length > 0) {
+                    token.CustomImage.ImageURL = url + '?' + Date.now();
+                    resolve();
+                } else {
+                    console.error("ERROR:  Couldn't find playermat TTS object");
+                    reject(new Error("ERROR:  Couldn't find playermat TTS object"));
+                }
+            }).catch((err) => {
+                reject(err);
+            });
+        } else {
+            console.error("ERROR:  Couldn't find PNG files for player aids.");
+            reject(new Error("ERROR:  Couldn't find PNG files for player aids."));
+        }
+    });
+}
+
 function uploadAndUpdateDeck(name, width, cin) {
     return new Promise((resolve, reject) => {
         let count = cin > 1 ? cin : 2;  // because TTS has to have at least 2 cards in a deck
@@ -222,6 +270,9 @@ function main() {
     for(let tokenKey in stats.tokens) {
         promises.push(uploadAndUpdateToken(tokenKey));
     }
+
+    promises.push(uploadAndUpdatePlayerMat());
+    promises.push(uploadAndUpdateRoundTracker())
 
     Promise.all(promises).then(() => {
 //        console.log(JSON.stringify(find('DeckCustom', 'ai_carver_hunter'), null, 2));
