@@ -8522,6 +8522,17 @@
           "Hands": true,
           "CardID": 14200,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8569,6 +8580,17 @@
           "Hands": true,
           "CardID": 14201,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8616,6 +8638,17 @@
           "Hands": true,
           "CardID": 14202,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8663,6 +8696,17 @@
           "Hands": true,
           "CardID": 14203,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8710,6 +8754,17 @@
           "Hands": true,
           "CardID": 14204,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8757,6 +8812,17 @@
           "Hands": true,
           "CardID": 14205,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8804,6 +8870,17 @@
           "Hands": true,
           "CardID": 14206,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8851,6 +8928,17 @@
           "Hands": true,
           "CardID": 14207,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
@@ -8898,6 +8986,17 @@
           "Hands": true,
           "CardID": 14208,
           "SidewaysCard": false,
+          "CustomDeck": {
+            "142": {
+              "FaceURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_fronts.png?1698519137532",
+              "BackURL": "https://road-warrior.s3.us-west-2.amazonaws.com/scenario_0_tier_back.png?1698519134632",
+              "NumWidth": 3,
+              "NumHeight": 3,
+              "BackIsHidden": false,
+              "UniqueBack": true,
+              "Type": 0
+            }
+          },
           "LuaScript": "",
           "LuaScriptState": "",
           "XmlUI": "",
