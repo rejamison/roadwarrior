@@ -215,6 +215,17 @@ function uploadAndUpdateDeck(name, width, cin) {
                         }
                     }
 
+                    // ensure that all the cards...
+                    deck.ContainedObjects.forEach((card) => {
+                        // have a matching deck object
+                        card["CustomDeck"] = deck["CustomDeck"];
+
+                        // have HideWhenFaceDown = false
+                        card["HideWhenFaceDown"] = false;
+
+                        delete card["ContainedObjects"];
+                    });
+
                     deck.CustomDeck[deckId].FaceURL = url + '?' + Date.now();
                     deck.CustomDeck[deckId].NumWidth = width;
                     deck.CustomDeck[deckId].NumHeight = height;

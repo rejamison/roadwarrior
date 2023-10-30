@@ -37,11 +37,11 @@
   "Sticky": true,
   "Tooltip": true,
   "GridProjection": false,
+  "HideWhenFaceDown": false,
   "Hands": true,
   "CardID": 999999,
   "SidewaysCard": false,
   "LuaScript": "",
   "LuaScriptState": "",
-  "XmlUI": "",
-  "ContainedObjects": []
+  "XmlUI": ""
 }
