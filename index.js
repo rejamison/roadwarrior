@@ -2,7 +2,9 @@ const cvs = require("canvas");
 const fs = require("fs");
 const rnd = require("./randomizer.js");
 const Cardistry = require('./cardistry.js');
-const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager, WordHighlighter, TextStyle, isDark, Mutator} = require("./cardistry");
+const {Card, BoundaryRect, GridCard, RotatedTextBox, TextBox, ImageManager, WordHighlighter, TextStyle, isDark, Mutator,
+    H_ALIGN, V_ALIGN
+} = require("./cardistry");
 const {Canvas, loadImage} = require("canvas");
 const {getAuthToken, getSheet, getSheetValues, download, upload} = require('./gutil');
 
@@ -47,15 +49,16 @@ const FONT_TYPES = {
     'rokkitt': 'Rokkitt',
     'rokkitt_bold': 'Rokkitt Bold',
     'rokkitt_light': 'Rokkitt Light',
-    'archivo': 'Archivo'
+    'archivo': 'Archivo',
+    'fredericka': 'Fredericka',
+    'alfaSlabOne': 'Alfa Slab One'
 }
 const STYLES = {
-    fullBack: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'center', 'middle'),
-    header: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
+    fullBack: new TextStyle(FONT_TYPES.alfaSlabOne, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'center', 'middle'),
+    header: new TextStyle(FONT_TYPES.alfaSlabOne, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
     body: new TextStyle(FONT_TYPES.rokkitt, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
     bodyBold: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
 }
-
 
 // setup the randomizer
 rnd.seed(Date.now().toString());
@@ -66,6 +69,8 @@ console.log('initializing with seed ' + rnd.getSeedString());
 cvs.registerFont('lib/rokkitt/static/Rokkitt-Bold.ttf', {family: FONT_TYPES.rokkitt_bold});
 cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONT_TYPES.rokkitt_light});
 cvs.registerFont('lib/Archivo_Black/ArchivoBlack-Regular.ttf', {family: FONT_TYPES.archivo});
+cvs.registerFont('lib/Fredericka_the_Great/FrederickatheGreat-Regular.ttf', {family: FONT_TYPES.fredericka});
+cvs.registerFont('lib/Alfa_Slab_One/AlfaSlabOne-Regular.ttf', {family: FONT_TYPES.alfaSlabOne});
 
 // load images
 const im = new ImageManager();
@@ -428,7 +433,7 @@ class RoadWarriorCardBack extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                STYLES.fullBack.recolor(isDark(this.bgColor) ? COLORS.white : COLORS.black),
+                STYLES.fullBack.recolor(isDark(this.bgColor) ? COLORS.white : COLORS.black).scale(0.9),
                 0,
                 this.getDrawableBoundRect().cutTopPct(0.5),
                 this.bgColor
@@ -444,10 +449,70 @@ class RoadWarriorCardBack extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.deckName,
-                STYLES.fullBack.scale(1.75),
+                STYLES.fullBack.scale(1.5),
                 0,
                 this.getDrawableBoundRect(),
                 this.bgColor));
+        }
+    }
+}
+
+class RoadWarriorAICardBack extends Cardistry.Card {
+    factionName
+    unitLogo
+    factionColor
+    unitName
+
+    constructor(factionName, factionColor, unitName, unitLogo) {
+        super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, factionColor, DEFAULT_DPI);
+
+        this.factionName = factionName;
+        this.unitName = unitName;
+        this.elementColor = isDark(this.factionColor) ? COLORS.white : COLORS.black;
+        this.unitLogo = im.getRecolored(unitLogo, this.elementColor);
+        this.factionColor = factionColor;
+
+        if(this.unitLogo) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.factionName,
+                STYLES.fullBack.recolor(this.elementColor).scale(0.8).realign(H_ALIGN.center, V_ALIGN.top),
+                0,
+                this.getDrawableBoundRect().cutBottomPct(0.75),
+                this.bgColor
+            ));
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getDrawableBoundRect().cutTopPct(0.25).cutBottomPct(0.25),
+                this.bgColor,
+                this.unitLogo,
+                false
+            ));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.unitName,
+                STYLES.fullBack.recolor(this.elementColor).scale(0.8).realign(H_ALIGN.center, V_ALIGN.bottom),
+                0,
+                this.getDrawableBoundRect().cutTopPct(0.75),
+                this.bgColor
+            ));
+        } else {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.factionName,
+                STYLES.fullBack.recolor(this.elementColor).scale(0.8).realign(H_ALIGN.center, V_ALIGN.top),
+                0,
+                this.getDrawableBoundRect().cutBottomPct(0.5),
+                this.bgColor
+            ));
+            this.addElement(new Cardistry.TextBox(
+                this,
+                this.unitName,
+                STYLES.fullBack.recolor(this.elementColor).scale(0.8).realign(H_ALIGN.center, V_ALIGN.bottom),
+                0,
+                this.getDrawableBoundRect().cutTopPct(0.5),
+                this.bgColor
+            ));
         }
     }
 }
@@ -632,7 +697,7 @@ class RoadWarriorAICard extends Cardistry.Card {
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            STYLES.header.scale(0.75),
+            STYLES.header.scale(0.65),
             0,
             this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
@@ -1106,7 +1171,8 @@ async function main() {
             let ai_sheet = new Cardistry.Sheet(ai_cards);
             exportScaledAndUpload(ai_sheet, 'var/tts/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
             ai_sheet.exportScaledPNG('var/pnp/ai_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, true);
-            let ai_back = new RoadWarriorCardBack(deckName + ' AI', ai_cards[0].vehicleIconImage, COLORS[Object.values(deck)[0]['Back Color']], COLORS.black);
+            let exemplar = Object.values(deck)[0];
+            let ai_back = new RoadWarriorAICardBack(exemplar['Faction'], COLORS[exemplar['Back Color']], exemplar['Vehicle'], exemplar['Vehicle Icon']);
             ai_back.draw();
             exportAndUpload(ai_back, 'var/tts/ai_' + convertToFilename(deckName) + '_back.png');
         }
