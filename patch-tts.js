@@ -29,6 +29,26 @@ function find(name, nickname) {
     return objs;
 }
 
+function getLua(path) {
+    return fs.readFileSync(path).toString();
+}
+
+function uploadStats() {
+    return new Promise((resolve, reject) => {
+        // sanity check that the files exist
+        if(fs.existsSync('var/stats.json')) {
+            upload(BUCKET, 'var/stats.json', 'application/json').then((url) => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            });
+        } else {
+            console.error("ERROR:  Couldn't find stats JSON file.");
+            reject(new Error("ERROR:  Couldn't find stats JSON file."));
+        }
+    });
+}
+
 function uploadAndUpdateDie(name) {
     return new Promise((resolve, reject) => {
         // sanity check that the files exist
@@ -38,13 +58,13 @@ function uploadAndUpdateDie(name) {
                 if(find('Custom_Dice', name).length > 0) {
                     const die = find('Custom_Dice', name)[0];
                     die.CustomImage.ImageURL = url + '?' + Date.now();
-                    resolve();
                 } else {
                     // add a new token object to the save
                     console.log("Adding die: " + name);
 
                     const bag = JSON.parse(fs.readFileSync('assets/die.json'));
                     bag.GUID = '';
+                    bag.Nickname = 'bag_' + name;
                     bag.Transform.posX = offset;
                     offset += NEW_ITEM_OFFSET;
                     bag.Transform.posZ = 0;
@@ -54,8 +74,9 @@ function uploadAndUpdateDie(name) {
                     die.Nickname = name;
                     die.CustomImage.ImageURL = url + '?' + Date.now();
                     save.ObjectStates.push(bag);
-                    resolve();
                 }
+
+                resolve();
             }).catch((err) => {
                 reject(err);
             });
@@ -151,7 +172,7 @@ function uploadAndUpdateRoundTracker() {
     });
 }
 
-function uploadAndUpdateDeck(name, width, cin) {
+function uploadAndUpdateDeck(type, name, width, cin, din) {
     return new Promise((resolve, reject) => {
         let count = cin > 1 ? cin : 2;  // because TTS has to have at least 2 cards in a deck
         let height = Math.ceil(count / width);  // because TTS has to have at least 2 rows in a deck front image
@@ -215,14 +236,25 @@ function uploadAndUpdateDeck(name, width, cin) {
                         }
                     }
 
+                    deck["HideWhenFaceDown"] = false;
+
                     // ensure that all the cards...
+                    let cards = din;
                     deck.ContainedObjects.forEach((card) => {
+                        // have a nickname
+                        let c = cards.shift();
+                        card["Nickname"] = c["Tag"];
+
                         // have a matching deck object
                         card["CustomDeck"] = deck["CustomDeck"];
 
                         // have HideWhenFaceDown = false
                         card["HideWhenFaceDown"] = false;
 
+                        // has its deck name as a tag
+                        card["Tags"] = [type, name];
+
+                        // don't have any objects inside them
                         delete card["ContainedObjects"];
                     });
 
@@ -258,20 +290,32 @@ function main() {
 
     for(let aiKey in stats.ais) {
         let count = Object.values(stats.ais[aiKey]).reduce((acc, val) => acc + parseInt(val.Qty), 0);
-        promises.push(uploadAndUpdateDeck('ai_' + convertToFilename(aiKey), 5, count));
+        let deck = Object.values(stats.ais[aiKey]).reduce((acc, val) => {
+            for(let i = 0; i < val.Qty; i++) {
+                acc.push(val);
+            }
+            return acc;
+        }, []);
+        promises.push(uploadAndUpdateDeck('ai', 'ai_' + convertToFilename(aiKey), 5, count, deck));
     }
 
-    promises.push(uploadAndUpdateDeck('initiative', 5, Object.keys(stats.vehicles).length));
+    promises.push(uploadAndUpdateDeck('initiative', 'initiative', 5, Object.keys(stats.vehicles).length, Object.values(stats.vehicles)));
 
     for(let itemKey in stats.items) {
         let count = Object.values(stats.items[itemKey]).reduce((acc, val) => acc + parseInt(val.Qty), 0);
-        promises.push(uploadAndUpdateDeck('item_' + convertToFilename(itemKey), 5, count));
+        let deck = Object.values(stats.items[itemKey]).reduce((acc, val) => {
+            for(let i = 0; i < val.Qty; i++) {
+                acc.push(val);
+            }
+            return acc;
+        }, []);
+        promises.push(uploadAndUpdateDeck('item', 'item_' + convertToFilename(itemKey), 5, count, deck));
     }
 
-    promises.push(uploadAndUpdateDeck('rule', 3, Object.keys(stats.rules).length));
+    promises.push(uploadAndUpdateDeck('rule', 'rule', 3, Object.keys(stats.rules).length, Object.values(stats.rules)));
 
     for(let scenarioKey in stats.scenarios) {
-        promises.push(uploadAndUpdateDeck('scenario_' + convertToFilename(scenarioKey), 3, Object.keys(stats.scenarios[scenarioKey]).length));
+        promises.push(uploadAndUpdateDeck('scenario', 'scenario_' + convertToFilename(scenarioKey), 3, Object.keys(stats.scenarios[scenarioKey]).length, Object.values(stats.scenarios[scenarioKey])));
     }
 
     for(let dieKey in stats.dice) {
@@ -283,15 +327,18 @@ function main() {
     }
 
     promises.push(uploadAndUpdatePlayerMat());
-    promises.push(uploadAndUpdateRoundTracker())
+    promises.push(uploadAndUpdateRoundTracker());
+    promises.push(uploadStats());
 
     Promise.all(promises).then(() => {
-//        console.log(JSON.stringify(find('DeckCustom', 'ai_carver_hunter'), null, 2));
-
         // update the save name
         save.SaveName = save.SaveName.replace(/(.* V)([0-9]+)/, (orig, a, b) => {
             return a + (parseInt(b) + 1);
         });
+
+        save.LuaScript = getLua('scripts/main.lua');
+        save.XmlUI = getLua('scripts/main.xml');
+
         fs.writeFileSync('var/tts/TS_Save_YYY.json', JSON.stringify(save, null, 2));
     }).catch((errs) => {
         console.error(errs);

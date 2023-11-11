@@ -1243,7 +1243,7 @@ async function main() {
         rule_back.draw();
         exportAndUpload(rule_back, 'var/tts/rule_back.png');
 
-        // export the card data for patcher to use
+        // export the card data for patcher and TTS to use
         const stats = {
             ais: ais,
             scenarios: scenarios,
@@ -1253,7 +1253,16 @@ async function main() {
             rules: rules,
             items: items
         };
+        Object.values(stats.items).forEach((itemDeck) => {
+            Object.values(itemDeck).forEach((item) => {
+                item.Dice = item.Dice.split(',').map((v) => v.trim());
+                if(item.Dice.length == 1 && item.Dice[0] == "") {
+                    item.Dice = [];
+                }
+            });
+        });
         fs.writeFileSync('var/stats.json', JSON.stringify(stats, null, 2));
     });
 }
+
 main();
