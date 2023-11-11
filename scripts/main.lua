@@ -54,6 +54,49 @@ function syncDice()
     end
 end
 
+function syncScenario()
+    local initiativeDeck = findOneByName("initiative")
+    initiativeDeck.reset()
+    local initiativeZone = findOneByName("zone_initiative_deck")
+
+    local scenarioZone = findOneByName('zone_current_scenario')
+    local objectsInZone = scenarioZone.getObjects()
+    for i, obj in ipairs(objectsInZone) do
+        if obj.hasTag("scenario") then
+            local scenario = lookupScenario(obj.getName())
+            if scenario ~= nil then
+                local tags = scenario['Initiative Tags'];
+                for i, tag in ipairs(tags) do
+                    takeObjectByName(initiativeDeck, tag, {
+                        position = initiativeZone.getPosition(),
+                        smooth = true
+                    })
+                end
+                return -- only handle the first card we find
+            else
+                print("Couldn't find stats for scenario: " .. obj.getName())
+            end
+        end
+    end
+end
+
+function takeObjectByName(parent, name, params)
+    local foundObj = nil
+    for i, obj in ipairs(parent.getObjects()) do
+        if obj.name == name then
+            foundObj = obj
+            break
+        end
+    end
+
+    if foundObj ~= nil then
+        params['guid'] = foundObj.guid
+        parent.takeObject(params)
+    else
+        print("No object to take with name: " .. name)
+    end
+end
+
 function drawDie(dieColor)
     local dieTag = lookupDieTagByColor(dieColor)
     local bag = findOneByName('bag_' .. dieTag)
@@ -93,6 +136,18 @@ function lookupItem(itemTag)
         end
     end
     print("Couldn't find item with tag: " .. itemTag)
+    return nil
+end
+
+function lookupScenario(scenarioTag)
+    local scenarioDecks = stats['scenarios']
+    for deckTag, deck in pairs(scenarioDecks) do
+        local scenario = deck[scenarioTag]
+        if scenario ~= nil then
+            return scenario
+        end
+    end
+    print("Couldn't find scenario with tag: " .. itemTag)
     return nil
 end
 

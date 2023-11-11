@@ -1253,6 +1253,8 @@ async function main() {
             rules: rules,
             items: items
         };
+
+        // patch the item dice values to be tags in TTS
         Object.values(stats.items).forEach((itemDeck) => {
             Object.values(itemDeck).forEach((item) => {
                 item.Dice = item.Dice.split(',').map((v) => v.trim());
@@ -1261,6 +1263,17 @@ async function main() {
                 }
             });
         });
+
+        // patch the scenario enemy vehicles to be tags in TTS
+        Object.values(stats.scenarios).forEach((scenarioDeck) => {
+            Object.values(scenarioDeck).forEach((scenario) => {
+                let uniqueTags = {};
+                let allTags = scenario['Enemies'].split(',').map((v) => v.substring(0, v.indexOf('(')).trim()).filter((v) => v !== "");
+                allTags.forEach((tag) => uniqueTags[tag] = true);
+                scenario['Initiative Tags'] = ['player', ...Object.keys(uniqueTags)];
+            });
+        });
+
         fs.writeFileSync('var/stats.json', JSON.stringify(stats, null, 2));
     });
 }
