@@ -1,7 +1,7 @@
-<Panel width="150" height="60" rectAlignment="MiddleRight">
+<Panel width="150" height="80" rectAlignment="MiddleRight">
     <VerticalLayout>
-        <Button onClick="setup">NEW GAME</Button>
-        <Button onClick="syncDice">SYNC DICE</Button>
-        <Button onClick="syncScenario">SETUP SCENARIO</Button>
+        <Button onClick="setup" id="setup" interactable="false">NEW GAME</Button>
+        <Button onClick="syncDice" id="syncDice" interactable="false">SYNC DICE</Button>
+        <Button onClick="syncScenario" id="syncScenario" interactable="false">SETUP SCENARIO</Button>
     </VerticalLayout>
 </Panel>

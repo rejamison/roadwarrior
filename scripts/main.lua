@@ -5,6 +5,10 @@ function onload()
     WebRequest.get('https://road-warrior.s3.us-west-2.amazonaws.com/stats.json', function(data)
         stats = JSON.decode(data.text)
         print('Loaded Card Stats.')
+
+        UI.setAttribute("setup", "interactable", "true")
+        UI.setAttribute("syncDice", "interactable", "true")
+        UI.setAttribute("syncScenario", "interactable", "true")
     end)
     math.randomseed(os.time())
     math.random()
@@ -28,17 +32,41 @@ function setup()
     for i, starterCard in ipairs(starterCards) do
         starterDeck.takeObject({
             guid = starterCard.guid,
-            position = {offsetX, 5, 0},
+            position = {offsetX, 5, -1},
             smooth = true,
             flip = true
         })
         offsetX = offsetX + 3
         if starterDeck.remainder ~= nil then
             starterDeck.remainder.flip()
-            starterDeck.remainder.setPositionSmooth({offsetX, 5, 0});
+            starterDeck.remainder.setPositionSmooth({offsetX, 5, -1});
             break
         end
     end
+
+    -- place the starting item draw
+    local zeroTierDeck = findOneByName("item_0_tier")
+    offsetX = -6;
+    for i=1,8,1 do
+        zeroTierDeck.takeObject({
+            position = {offsetX, 5, 3},
+            smooth = true,
+            flip = true
+        })
+        offsetX = offsetX + 3
+    end
+
+    -- take starting gas
+    local gasBag = findOneByName("bag_token_gas")
+    for i=1,3,1 do
+        gasBag.takeObject({
+            position = {15, 5, -11},
+            rotation = {0, 180, 0},
+            smooth = true
+        })
+    end
+
+    UI.setAttribute("setup", "interactable", "false")
 end
 
 function syncDice()
@@ -56,7 +84,6 @@ end
 
 function syncScenario()
     local initiativeDeck = findOneByName("initiative")
-    initiativeDeck.reset()
     local initiativeZone = findOneByName("zone_initiative_deck")
 
     local scenarioZone = findOneByName('zone_current_scenario')
@@ -72,12 +99,21 @@ function syncScenario()
                         smooth = true
                     })
                 end
-                return -- only handle the first card we find
+                break -- only handle the first card we find
             else
                 print("Couldn't find stats for scenario: " .. obj.getName())
             end
         end
     end
+
+    -- shuffle the initiative deck after a few seconds
+    Wait.time(function()
+        for i, obj in ipairs(initiativeZone.getObjects()) do
+            if obj.type == 'Deck' then
+                obj.randomize()
+            end
+        end
+    end, 2)
 end
 
 function takeObjectByName(parent, name, params)
