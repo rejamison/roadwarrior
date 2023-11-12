@@ -1,5 +1,6 @@
-<Panel width="150" height="80" rectAlignment="MiddleRight">
+<Panel width="150" height="100" rectAlignment="MiddleRight">
     <VerticalLayout>
+        <Button onClick="resetAllDecks" id="resetAllDecks" interactable="false">RESET</Button>
         <Button onClick="setup" id="setup" interactable="false">NEW GAME</Button>
         <Button onClick="syncDice" id="syncDice" interactable="false">SYNC DICE</Button>
         <Button onClick="syncScenario" id="syncScenario" interactable="false">SETUP SCENARIO</Button>

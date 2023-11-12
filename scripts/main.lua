@@ -2,11 +2,12 @@ stats = nil
 originalPositions = {}
 
 function onload()
-    print('Loading Card Stats...')
+    broadcastToAll('Loading Lex Talionis Scripts...', {r=0,g=1,b=0})
     WebRequest.get('https://road-warrior.s3.us-west-2.amazonaws.com/stats.json', function(data)
         stats = JSON.decode(data.text)
-        print('Loaded Card Stats.')
+        broadcastToAll('Loaded Lex Talionis Scripts', {r=0,g=1,b=0})
 
+        UI.setAttribute("resetAllDecks", "interactable", "true")
         UI.setAttribute("setup", "interactable", "true")
         UI.setAttribute("syncDice", "interactable", "true")
         UI.setAttribute("syncScenario", "interactable", "true")
@@ -17,8 +18,8 @@ function onload()
     math.random()
 
     -- remember the positions of all the original decks
-    for i, obj in ipairs(getAllObjects()) do
-        if obj.name == "DeckCustom" then
+    for i, obj in ipairs(getObjects()) do
+        if obj.type == "Deck" then
             originalPositions[obj.getName()] = obj.getPosition()
         end
     end
@@ -26,24 +27,35 @@ end
 
 function resetDeck(tag)
     -- sweep all objects with the deck tag into the original decks
-    for i, obj in ipairs(getAllObjects()) do
+    for i, obj in ipairs(getObjects()) do
         if obj.hasTag(tag) then
-            obj.setPosition(originalPositions[tag]);
+            if not obj.is_face_down then obj.flip() end
+            obj.setPosition(originalPositions[tag])
         end
     end
+
+    Wait.time(function()
+        for i, obj in ipairs(getObjects()) do
+            if obj.hasTag(tag) then
+                obj.setName(tag)
+                obj.randomize()
+            end
+        end
+    end, 1)
 end
 
 function resetAllDecks()
     for deckName, position in pairs(originalPositions) do
         resetDeck(deckName)
     end
+    UI.setAttribute("setup", "interactable", "true")
 end
 
 function setup()
     -- shuffle all the decks
-    local objs = getAllObjects()
+    local objs = getObjects()
     for i, obj in ipairs(objs) do
-        if obj.name == "DeckCustom" and obj.getName() ~= "rule" and obj.getName() ~= "item_starter" then
+        if obj.type == "Deck" and obj.getName() ~= "rule" and obj.getName() ~= "item_starter" then
             obj.randomize()
         end
     end
@@ -83,7 +95,7 @@ function setup()
     local gasBag = findOneByName("bag_token_gas")
     for i=1,3,1 do
         gasBag.takeObject({
-            position = {15, 5, -11},
+            position = {16, 5, -10},
             rotation = {0, 180, 0},
             smooth = true
         })
@@ -95,10 +107,10 @@ end
 function syncDice()
     local zone = findOneByName('zone_active_items')
     local activeItems = zone.getObjects()
-    for i, activeItem in ipairs(activeItems) do
+    for _, activeItem in ipairs(activeItems) do
         if activeItem.hasTag("item") then
             local item = lookupItem(activeItem.getName())
-            for i, dieColor in ipairs(item['Dice']) do
+            for _, dieColor in ipairs(item['Dice']) do
                 drawDie(dieColor)
             end
         end
@@ -106,37 +118,62 @@ function syncDice()
 end
 
 function syncScenario()
+    -- reset the cards we'll be using
+    resetDeck("initiative")
+    for key, val in pairs(originalPositions) do
+        if string.sub(key, 1, 3) == 'ai_' then
+            resetDeck(key)
+        end
+    end
+
     local initiativeDeck = findOneByName("initiative")
     local initiativeZone = findOneByName("zone_initiative_deck")
-
+    local aiZoneA = findOneByName("zone_ai_a")
+    local aiZoneB = findOneByName("zone_ai_b")
+    local aiZoneC = findOneByName("zone_ai_c")
+    local aiZoneD = findOneByName("zone_ai_d")
     local scenarioZone = findOneByName('zone_current_scenario')
     local objectsInZone = scenarioZone.getObjects()
     for i, obj in ipairs(objectsInZone) do
         if obj.hasTag("scenario") then
             local scenario = lookupScenario(obj.getName())
             if scenario ~= nil then
-                local tags = scenario['Initiative Tags'];
+                -- setup initiative cards
+                local tags = scenario['Initiative Tags']
                 for i, tag in ipairs(tags) do
                     takeObjectByName(initiativeDeck, tag, {
                         position = initiativeZone.getPosition(),
                         smooth = true
                     })
                 end
+                Wait.time(function()
+                    for i, obj in ipairs(initiativeZone.getObjects()) do
+                        if obj.type == 'Deck' then
+                            obj.randomize()
+                        end
+                    end
+                end, 2)
+
+                -- setup AI decks
+                local aiTags = scenario['AI Tags']
+                for i, aiTag in ipairs(aiTags) do
+                    local aiDeck = findOneByName(aiTag)
+                    if i == 1 then aiDeck.setPosition(aiZoneA.getPosition())
+                    elseif i == 2 then aiDeck.setPosition(aiZoneB.getPosition())
+                    elseif i == 3 then aiDeck.setPosition(aiZoneC.getPosition())
+                    elseif i == 4 then aiDeck.setPosition(aiZoneD.getPosition())
+                    else
+                        print('Unexpected AI deck index: ' .. i)
+                    end
+                    aiDeck.randomize()
+                end
+
                 break -- only handle the first card we find
             else
                 print("Couldn't find stats for scenario: " .. obj.getName())
             end
         end
     end
-
-    -- shuffle the initiative deck after a few seconds
-    Wait.time(function()
-        for i, obj in ipairs(initiativeZone.getObjects()) do
-            if obj.type == 'Deck' then
-                obj.randomize()
-            end
-        end
-    end, 2)
 end
 
 function takeObjectByName(parent, name, params)
@@ -166,7 +203,7 @@ function drawDie(dieColor)
 end
 
 function findOneByName(name)
-    local objs = getAllObjects()
+    local objs = getObjects()
     for i, obj in ipairs(objs) do
         if obj.getName() == name then
             return obj
@@ -176,7 +213,7 @@ function findOneByName(name)
 end
 
 function findAllByTag(tag)
-    local objs = getAllObjects()
+    local objs = getObjects()
     local found = {}
     for i, obj in ipairs(objs) do
         if obj.hasTag(tag) then
@@ -206,7 +243,7 @@ function lookupScenario(scenarioTag)
             return scenario
         end
     end
-    print("Couldn't find scenario with tag: " .. itemTag)
+    print("Couldn't find scenario with tag: " .. scenarioTag)
     return nil
 end
 

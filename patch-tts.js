@@ -225,7 +225,7 @@ function uploadAndUpdateDeck(type, name, width, cin, din) {
                             deck.DeckIDs.push(nextId);
                             card.CardID = nextId;
                             card.GUID = '';
-                            card.nickname = '';  // TODO: Add card names?
+                            card.Nickname = '';  // TODO: Add card names?
                             deck.ContainedObjects.push(card);
                         }
                     } else if(deck.DeckIDs.length > count) {
@@ -237,6 +237,7 @@ function uploadAndUpdateDeck(type, name, width, cin, din) {
                     }
 
                     deck["HideWhenFaceDown"] = false;
+                    deck["Tags"] = [name];
 
                     // ensure that all the cards...
                     let cards = din;
