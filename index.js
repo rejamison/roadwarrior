@@ -1268,9 +1268,16 @@ async function main() {
         Object.values(stats.scenarios).forEach((scenarioDeck) => {
             Object.values(scenarioDeck).forEach((scenario) => {
                 let uniqueTags = {};
+                let uniqueAiTags = {};
                 let allTags = scenario['Enemies'].split(',').map((v) => v.substring(0, v.indexOf('(')).trim()).filter((v) => v !== "");
-                allTags.forEach((tag) => uniqueTags[tag] = true);
+                allTags.forEach((tag) => {
+                    uniqueTags[tag] = true
+                    let vehicle = stats.vehicles[tag];
+                    let aiTag = 'ai_' + convertToFilename(vehicle["Faction"] + ' ' + vehicle["Name Text"]);
+                    uniqueAiTags[aiTag] = true;
+                });
                 scenario['Initiative Tags'] = ['player', ...Object.keys(uniqueTags)];
+                scenario['AI Tags'] = [...Object.keys(uniqueAiTags)];
             });
         });
 

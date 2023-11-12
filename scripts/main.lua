@@ -1,4 +1,5 @@
-stats = nil;
+stats = nil
+originalPositions = {}
 
 function onload()
     print('Loading Card Stats...')
@@ -14,6 +15,28 @@ function onload()
     math.random()
     math.random()
     math.random()
+
+    -- remember the positions of all the original decks
+    for i, obj in ipairs(getAllObjects()) do
+        if obj.name == "DeckCustom" then
+            originalPositions[obj.getName()] = obj.getPosition()
+        end
+    end
+end
+
+function resetDeck(tag)
+    -- sweep all objects with the deck tag into the original decks
+    for i, obj in ipairs(getAllObjects()) do
+        if obj.hasTag(tag) then
+            obj.setPosition(originalPositions[tag]);
+        end
+    end
+end
+
+function resetAllDecks()
+    for deckName, position in pairs(originalPositions) do
+        resetDeck(deckName)
+    end
 end
 
 function setup()
