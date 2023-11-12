@@ -1292,6 +1292,34 @@ async function main() {
                     uniqueAiTags[aiTag] = true;
                     scenario['Model Tags'].push(enemy)
                 });
+
+                // check for multi-square units
+                Object.keys(uniqueTags).forEach((tag) => {
+                    let size = parseInt(stats.vehicles[tag].Size);
+                    if(size > 1) {
+                        scenario['Model Tags'] = scenario['Model Tags'].reduce((acc, val) => {
+                            if(val.tag === tag) {
+                                if(acc.find((v) => v.tag === tag)) {
+                                    // do nothing
+                                } else {
+                                    if(size == 2) {
+                                        val.y += 0.5;
+                                    } else if(size == 4) {
+                                        val.x += 0.5;
+                                        val.y += 0.5;
+                                    } else {
+                                        console.log("ERROR: Unknown vehicle size: " + size)
+                                    }
+                                    acc.push(val);
+                                }
+                            } else {
+                                acc.push(val);
+                            }
+                            return acc;
+                        }, []);
+                    }
+                });
+
                 scenario['Initiative Tags'] = ['player', ...Object.keys(uniqueTags)];
                 scenario['AI Tags'] = [...Object.keys(uniqueAiTags)];
                 let playerPos = scenario['Player Pos'].split(',');
