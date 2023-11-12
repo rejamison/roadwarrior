@@ -1267,17 +1267,38 @@ async function main() {
         // patch the scenario enemy vehicles to be tags in TTS
         Object.values(stats.scenarios).forEach((scenarioDeck) => {
             Object.values(scenarioDeck).forEach((scenario) => {
+                scenario['Model Tags'] = []
                 let uniqueTags = {};
                 let uniqueAiTags = {};
-                let allTags = scenario['Enemies'].split(',').map((v) => v.substring(0, v.indexOf('(')).trim()).filter((v) => v !== "");
-                allTags.forEach((tag) => {
-                    uniqueTags[tag] = true
-                    let vehicle = stats.vehicles[tag];
+                let allTags = scenario['Enemies'].split('\n').map((v) => v.trim()).filter((v) => v !== "");
+                allTags.forEach((loc) => {
+                    const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
+                    const result = re.exec(loc);
+                    let enemy = {
+                        tag: result[1],
+                        x: result[2] - 1,
+                        y: result[3] - 1
+                    };
+                    let vehicle = stats.vehicles[enemy.tag];
+                    let color = COLORS[vehicle.Color];
+                    enemy.color = {
+                        r: parseInt(color.substring(0, 2), 16) / 255.0,
+                        g: parseInt(color.substring(2, 4), 16) / 255.0,
+                        b: parseInt(color.substring(4, 6), 16) / 255.0
+                    };
+                    enemy.model = 'model_' + vehicle['Vehicle Icon'];
+                    uniqueTags[enemy.tag] = true;
                     let aiTag = 'ai_' + convertToFilename(vehicle["Faction"] + ' ' + vehicle["Name Text"]);
                     uniqueAiTags[aiTag] = true;
+                    scenario['Model Tags'].push(enemy)
                 });
                 scenario['Initiative Tags'] = ['player', ...Object.keys(uniqueTags)];
                 scenario['AI Tags'] = [...Object.keys(uniqueAiTags)];
+                let playerPos = scenario['Player Pos'].split(',');
+                scenario['Player Pos'] = {
+                    x: parseInt(playerPos[0]),
+                    y: parseInt(playerPos[1])
+                };
             });
         });
 

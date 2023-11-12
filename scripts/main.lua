@@ -18,7 +18,7 @@ function onload()
     math.random()
 
     -- remember the positions of all the original decks
-    for i, obj in ipairs(getObjects()) do
+    for _, obj in ipairs(getObjects()) do
         if obj.type == "Deck" then
             originalPositions[obj.getName()] = obj.getPosition()
         end
@@ -27,7 +27,7 @@ end
 
 function resetDeck(tag)
     -- sweep all objects with the deck tag into the original decks
-    for i, obj in ipairs(getObjects()) do
+    for _, obj in ipairs(getObjects()) do
         if obj.hasTag(tag) then
             if not obj.is_face_down then obj.flip() end
             obj.setPosition(originalPositions[tag])
@@ -35,7 +35,7 @@ function resetDeck(tag)
     end
 
     Wait.time(function()
-        for i, obj in ipairs(getObjects()) do
+        for _, obj in ipairs(getObjects()) do
             if obj.hasTag(tag) then
                 obj.setName(tag)
                 obj.randomize()
@@ -44,9 +44,12 @@ function resetDeck(tag)
     end, 1)
 end
 
-function resetAllDecks()
+function resetAll()
     for deckName, position in pairs(originalPositions) do
         resetDeck(deckName)
+    end
+    for _,obj in ipairs(getObjects()) do
+        if obj.hasTag('clone') then obj.destruct() end
     end
     UI.setAttribute("setup", "interactable", "true")
 end
@@ -54,7 +57,7 @@ end
 function setup()
     -- shuffle all the decks
     local objs = getObjects()
-    for i, obj in ipairs(objs) do
+    for _, obj in ipairs(objs) do
         if obj.type == "Deck" and obj.getName() ~= "rule" and obj.getName() ~= "item_starter" then
             obj.randomize()
         end
@@ -64,7 +67,7 @@ function setup()
     local starterDeck = findOneByName("item_starter")
     local starterCards = starterDeck.getObjects()
     local offsetX = -6;
-    for i, starterCard in ipairs(starterCards) do
+    for _, starterCard in ipairs(starterCards) do
         starterDeck.takeObject({
             guid = starterCard.guid,
             position = {offsetX, 5, -1},
@@ -125,6 +128,9 @@ function syncScenario()
             resetDeck(key)
         end
     end
+    for _,obj in ipairs(getObjects()) do
+        if obj.hasTag('clone') then obj.destruct() end
+    end
 
     local initiativeDeck = findOneByName("initiative")
     local initiativeZone = findOneByName("zone_initiative_deck")
@@ -134,22 +140,22 @@ function syncScenario()
     local aiZoneD = findOneByName("zone_ai_d")
     local scenarioZone = findOneByName('zone_current_scenario')
     local objectsInZone = scenarioZone.getObjects()
-    for i, obj in ipairs(objectsInZone) do
+    for _, obj in ipairs(objectsInZone) do
         if obj.hasTag("scenario") then
             local scenario = lookupScenario(obj.getName())
             if scenario ~= nil then
                 -- setup initiative cards
                 local tags = scenario['Initiative Tags']
-                for i, tag in ipairs(tags) do
+                for _, tag in ipairs(tags) do
                     takeObjectByName(initiativeDeck, tag, {
                         position = initiativeZone.getPosition(),
                         smooth = true
                     })
                 end
                 Wait.time(function()
-                    for i, obj in ipairs(initiativeZone.getObjects()) do
-                        if obj.type == 'Deck' then
-                            obj.randomize()
+                    for _, newObj in ipairs(initiativeZone.getObjects()) do
+                        if newObj.type == 'Deck' then
+                            newObj.randomize()
                         end
                     end
                 end, 2)
@@ -168,6 +174,32 @@ function syncScenario()
                     aiDeck.randomize()
                 end
 
+                -- setup models
+                local zoneTopLeft = findOneByName("zone_top_left")
+                local topLeftPos = zoneTopLeft.getPosition()
+                local pitchX = 2.7 --zoneTopLeft.getBounds()['size']['x']
+                local pitchY = -4.05 --zoneTopLeft.getBounds()['size']['y']
+                local models = scenario['Model Tags']
+                for _, model in ipairs(models) do
+                    local master = findOneByName(model['model'])
+                    local clone = master.clone({
+                        position = {
+                            topLeftPos['x'] + (pitchX * model['x']),
+                            topLeftPos['y'] + 3,
+                            topLeftPos['z'] + (pitchY * model['y'])
+                        }
+                    })
+                    clone.setColorTint(model['color'])
+                    clone.setName(model['tag'])
+                    clone.addTag('clone')
+                end
+                local player = findOneByName('player')
+                player.setPosition({
+                    topLeftPos['x'] + (pitchX * (scenario['Player Pos']['x'] - 1)),
+                    topLeftPos['y'] + 3,
+                    topLeftPos['z'] + (pitchY * (scenario['Player Pos']['y'] - 1))
+                })
+
                 break -- only handle the first card we find
             else
                 print("Couldn't find stats for scenario: " .. obj.getName())
@@ -177,8 +209,8 @@ function syncScenario()
 end
 
 function takeObjectByName(parent, name, params)
-    local foundObj = nil
-    for i, obj in ipairs(parent.getObjects()) do
+    local foundObj
+    for _, obj in ipairs(parent.getObjects()) do
         if obj.name == name then
             foundObj = obj
             break
@@ -204,7 +236,7 @@ end
 
 function findOneByName(name)
     local objs = getObjects()
-    for i, obj in ipairs(objs) do
+    for _, obj in ipairs(objs) do
         if obj.getName() == name then
             return obj
         end
@@ -215,7 +247,7 @@ end
 function findAllByTag(tag)
     local objs = getObjects()
     local found = {}
-    for i, obj in ipairs(objs) do
+    for _, obj in ipairs(objs) do
         if obj.hasTag(tag) then
             table.insert(found, obj)
         end
