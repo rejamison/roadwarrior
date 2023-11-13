@@ -1,0 +1,7 @@
+<Panel width="333" height="111" position="0 -200 -300">
+    <HorizontalLayout>
+        <Button onClick="minus" id="minus" resizeTextForBestFit="true" resizeTextMinSize="75">-</Button>
+        <Text id="value" resizeTextForBestFit="true" resizeTextMinSize="75" color="#FF0000" fontStyle="Bold">0</Text>
+        <Button onClick="plus" id="plus" resizeTextForBestFit="true" resizeTextMinSize="75">+</Button>
+    </HorizontalLayout>
+</Panel>
