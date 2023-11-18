@@ -177,8 +177,8 @@ function syncScenario()
                 -- setup models
                 local zoneTopLeft = findOneByName("zone_top_left")
                 local topLeftPos = zoneTopLeft.getPosition()
-                local pitchX = 2.7 --zoneTopLeft.getBounds()['size']['x']
-                local pitchY = -4.05 --zoneTopLeft.getBounds()['size']['y']
+                local pitchX = 4.05 --zoneTopLeft.getBounds()['size']['x']
+                local pitchY = -2.7 --zoneTopLeft.getBounds()['size']['y']
                 local models = scenario['Model Tags']
                 for _, model in ipairs(models) do
                     local master = findOneByName(model['model'])

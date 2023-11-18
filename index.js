@@ -865,15 +865,15 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
 
         this.factionText = faction;
         this.nameText = name;
-        this.playerPosX = playerPos.split(',')[0] - 1;
-        this.playerPosY = playerPos.split(',')[1] - 1;
+        this.playerPosY = playerPos.split(',')[0] - 1 - 3;
+        this.playerPosX = 10 - playerPos.split(',')[1] - 1;
         this.enemies = enemies.trim().split('\n').map((value) => {
             const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
             const result = re.exec(value);
             let enemy = {
                 tag: result[1],
-                x: result[2] - 1,
-                y: result[3] - 1
+                y: result[2] - 1 - 3,
+                x: 10 - result[3] - 1
             };
 
             if(vehicles[enemy.tag]) {
@@ -888,14 +888,14 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
 
 
         const mapRect = this.getDrawableBoundRect().cutPct(0, 0.3, 0, 0.15);
-        const fudgeRect = mapRect.cutPct(0, 0, 0.055, 0.055);
-        // this.addElement(new Cardistry.Box(
-        //     this,
-        //     fudgeRect,
-        //     COLORS.grey
-        // ));
-        let h = fudgeRect.h / 7;
-        let w = fudgeRect.w / 15;
+        const fudgeRect = mapRect.cutPct(0, 0, 0.115, 0.115);
+        this.addElement(new Cardistry.Box(
+            this,
+            fudgeRect,
+            COLORS.grey
+        ));
+        let h = fudgeRect.h / 9;
+        let w = fudgeRect.w / 10;
         let vehiclesFound = {};
         for(let enemy of this.enemies) {
             let vehicle = vehicles[enemy.tag];
@@ -1276,8 +1276,8 @@ async function main() {
                     const result = re.exec(loc);
                     let enemy = {
                         tag: result[1],
-                        x: result[2] - 1,
-                        y: result[3] - 1
+                        y: result[2] - 1 - 3,
+                        x: 10 - result[3] - 1
                     };
                     let vehicle = stats.vehicles[enemy.tag];
                     let color = COLORS[vehicle.Color];
@@ -1324,8 +1324,8 @@ async function main() {
                 scenario['AI Tags'] = [...Object.keys(uniqueAiTags)];
                 let playerPos = scenario['Player Pos'].split(',');
                 scenario['Player Pos'] = {
-                    x: parseInt(playerPos[0]),
-                    y: parseInt(playerPos[1])
+                    y: parseInt(playerPos[0]) - 3,
+                    x: 10 - parseInt(playerPos[1])
                 };
             });
         });
