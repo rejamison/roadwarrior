@@ -83,7 +83,7 @@ function setup()
     end
 
     -- place the starting item draw
-    local zeroTierDeck = findOneByName("item_0_tier")
+    local zeroTierDeck = findOneByName("item_tier_1")
     offsetX = -6;
     for i=1,8,1 do
         zeroTierDeck.takeObject({

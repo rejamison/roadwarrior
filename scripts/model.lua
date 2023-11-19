@@ -1,5 +1,10 @@
 value = 0
 function onload()
+    local s = self.getScale()
+    local x = 1 / s.x
+    local y = 1 / s.y
+    local z = 1 / s.z
+    self.UI.setAttribute("tracker", "scale", x .. " " .. y .. " " .. z)
     sync()
 end
 

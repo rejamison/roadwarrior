@@ -340,16 +340,14 @@ function main() {
         save.LuaScript = getLua('scripts/main.lua');
         save.XmlUI = getLua('scripts/main.xml');
 
-        /**
-        let uniqueModels = [
-            "model_semi", "model_tank", "model_jeep", "model_bus", "model_buggy", "model_atv", "model_bike", "model_cadillac", "model_half_bus", "model_horse", "model_roadster", "model_van"
-        ];
-        uniqueModels.forEach((modelTag) => {
-            let model = find("Custom_Model", modelTag)[0];
-            model.LuaScript = getLua('scripts/model.lua');
-            model.XmlUI = getLua('scripts/model.xml');
-        });
-         */
+        // let uniqueModels = [
+        //     "model_semi", "model_tank", "model_jeep", "model_bus", "model_buggy", "model_atv", "model_bike", "model_cadillac", "model_half_bus", "model_horse", "model_roadster", "model_van"
+        // ];
+        // uniqueModels.forEach((modelTag) => {
+        //     let model = find("Custom_Model", modelTag)[0];
+        //     model.LuaScript = getLua('scripts/model.lua');
+        //     model.XmlUI = getLua('scripts/model.xml');
+        // });
 
         fs.writeFileSync('var/tts/TS_Save_YYY.json', JSON.stringify(save, null, 2));
     }).catch((errs) => {
