@@ -45,23 +45,24 @@ function resetDeck(tag)
 end
 
 function resetAll()
-    for deckName, position in pairs(originalPositions) do
-        resetDeck(deckName)
-    end
+    resetAllDecks()
     for _,obj in ipairs(getObjects()) do
         if obj.hasTag('clone') then obj.destruct() end
     end
-    UI.setAttribute("setup", "interactable", "true")
+
+    Wait.time(function()
+        UI.setAttribute("setup", "interactable", "true")
+    end, 2)
+end
+
+function resetAllDecks()
+    for deckName, position in pairs(originalPositions) do
+        resetDeck(deckName)
+    end
 end
 
 function setup()
-    -- shuffle all the decks
-    local objs = getObjects()
-    for _, obj in ipairs(objs) do
-        if obj.type == "Deck" and obj.getName() ~= "rule" and obj.getName() ~= "item_starter" then
-            obj.randomize()
-        end
-    end
+    resetAllDecks();
 
     -- place the starter items
     local starterDeck = findOneByName("item_starter")

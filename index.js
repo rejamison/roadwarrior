@@ -554,8 +554,10 @@ class RoadWarriorItemCard extends Cardistry.Card {
     attackEffectText
     attackArcImage
     attackRange
+    isWeakSpot
+    keywords
 
-    constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange) {
+    constructor(title, body, hp, dice, slots, attackCost, attackEffect, attackArc, attackRange, isWeakSpot, keywords) {
         super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, DEFAULT_CARD_BG_COLOR, DEFAULT_DPI);
 
         this.title = title;
@@ -570,17 +572,41 @@ class RoadWarriorItemCard extends Cardistry.Card {
         this.attackEffectText = attackEffect;
         this.attackArcImage = renderArc(attackArc);
         this.attackRange = attackRange;
+        this.isWeakSpot = isWeakSpot.toLowerCase() === 'y';
+        this.keywords = someOrNone(keywords);
 
+        // background
+        if(this.isWeakSpot) {
+            this.addElement(new Cardistry.ImageBox(
+                this,
+                this.getFullBoundRect(),
+                this.bgColor,
+                im.get('item_bg_weak'),
+                true,
+                H_ALIGN.center,
+                V_ALIGN.middle
+            ));
+        }
         // title
         this.addElement(new Cardistry.TextBox(
             this,
             this.title,
-            STYLES.header.scale(0.75),
+            STYLES.header.scale(0.60),
             0,
             this.getDrawableBoundRect().cutPct(0, 0.2, 0, 0.8),
             this.bgColor));
+        if(this.keywords) {
+            this.addElement(new Cardistry.TextBox(
+                this,
+                keywords,
+                STYLES.header.scale(0.4).realign(H_ALIGN.left, V_ALIGN.bottom),
+                0,
+                this.getDrawableBoundRect().cutPct(0, 0, 0.15, 0.81),
+                null
+            ));
+        }
         if(this.attackCostImages.length > 0) {
-            let attackBoxRect = this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.2);
+            let attackBoxRect = this.getDrawableBoundRect().cutPct(0, 0, 0.2, 0.125);
             let attackBoxBgColor = COLORS['gray'];
             this.addElement(new Cardistry.Box(this, attackBoxRect, attackBoxBgColor));
             attackBoxRect = attackBoxRect.shrink(20);
@@ -597,7 +623,7 @@ class RoadWarriorItemCard extends Cardistry.Card {
             this.addElement(new Cardistry.TextBox(
                 this,
                 this.attackEffectText,
-                STYLES.body.scale(0.55).realign('left', 'middle'),
+                STYLES.body.scale(0.5).realign('left', 'middle'),
                 0,
                 attackBoxRect.cutPct(0.33, 0, 0, 0).cutLeft(20),
                 attackBoxBgColor,
@@ -1104,7 +1130,9 @@ async function main() {
                     item['Attack Cost'],
                     item['Attack Effect'],
                     item['Attack Arc'],
-                    item['Attack Range']);
+                    item['Attack Range'],
+                    item['Weak Point'],
+                    item['Keywords']);
                 try {
                     card.draw();
                 } catch(err) {
@@ -1182,8 +1210,8 @@ async function main() {
             let tokenImage = im.get(token['Icon']);
             const canvas = cvs.createCanvas(tokenImage.width, tokenImage.height);
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#' + COLORS.white;
-            ctx.fillRect(0, 0, tokenImage.width, tokenImage.height);
+            // ctx.fillStyle = '#' + COLORS.white;
+            // ctx.fillRect(0, 0, tokenImage.width, tokenImage.height);
             ctx.drawImage(tokenImage, 0, 0);
             const out = fs.createWriteStream('var/tts/' + token['Tag'] + ".png");
             canvas.createPNGStream().pipe(out);
