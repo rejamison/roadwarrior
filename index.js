@@ -457,6 +457,24 @@ class RoadWarriorCardBack extends Cardistry.Card {
     }
 }
 
+class RoadWarriorItemCardBack extends Cardistry.Card {
+    image
+
+    constructor(image) {
+        super(CARD_WIDTH, CARD_HEIGHT, CARD_BLEED, CARD_SAFE, CARD_EXTRA, COLORS.white, DEFAULT_DPI);
+
+        this.image = image;
+
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getFullBoundRect(),
+            this.bgColor,
+            this.image,
+            true
+        ));
+    }
+}
+
 class RoadWarriorAICardBack extends Cardistry.Card {
     factionName
     unitLogo
@@ -1046,6 +1064,13 @@ async function loadSheet() {
             }
         }
 
+        // load all the backs
+        im.loadImage('item_starter_back', 'assets/back_item_starter.png')
+        im.loadImage('item_tier_1_back', 'assets/back_item_tier_1.png')
+        im.loadImage('item_tier_2_back', 'assets/back_item_tier_2.png')
+        im.loadImage('item_tier_3_back', 'assets/back_item_tier_3.png')
+        im.loadImage('item_tier_4_back', 'assets/back_item_tier_4.png')
+
         // load all the dice
         const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
         dice = rowsToObjects(dice_response.data.values);
@@ -1116,7 +1141,6 @@ async function main() {
         }
 
         // generate items
-        // TODO: add support for icons in text
         for(let deckName in items) {
             let deck = items[deckName];
             let item_cards = [];
@@ -1146,7 +1170,7 @@ async function main() {
             }
             let item_sheet = new Cardistry.Sheet(item_cards);
             exportScaledAndUpload(item_sheet, 'var/tts/item_' + convertToFilename(deckName) + '_fronts.png', 5, 1, true, false);
-            let item_back = new RoadWarriorCardBack(deckName + ' Items', null, COLORS.blue, COLORS.white);
+            let item_back = new RoadWarriorItemCardBack(im.get('item_' + convertToFilename(deckName) + '_back'));
             item_back.draw();
             exportAndUpload(item_back, 'var/tts/item_' + convertToFilename(deckName) + '_back.png')
         }
