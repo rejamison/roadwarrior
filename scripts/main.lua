@@ -36,7 +36,7 @@ function resetDeck(tag)
 
     Wait.time(function()
         for _, obj in ipairs(getObjects()) do
-            if obj.hasTag(tag) then
+            if obj.hasTag(tag) and obj.type == 'Deck' then
                 obj.setName(tag)
                 obj.randomize()
             end
@@ -148,6 +148,7 @@ function syncScenario()
                 -- setup initiative cards
                 local tags = scenario['Initiative Tags']
                 for _, tag in ipairs(tags) do
+                    print(tag)
                     takeObjectByName(initiativeDeck, tag, {
                         position = initiativeZone.getPosition(),
                         smooth = true
@@ -211,15 +212,17 @@ end
 
 function takeObjectByName(parent, name, params)
     local foundObj
+    local foundObjIdx
     for _, obj in ipairs(parent.getObjects()) do
         if obj.name == name then
             foundObj = obj
+            foundObjIdx = obj.index
             break
         end
     end
 
     if foundObj ~= nil then
-        params['guid'] = foundObj.guid
+        params['index'] = foundObjIdx
         parent.takeObject(params)
     else
         print("No object to take with name: " .. name)
