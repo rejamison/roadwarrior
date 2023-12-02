@@ -84,10 +84,11 @@ function setup()
     end
 
     -- place the starting item draw
-    local zeroTierDeck = findOneByName("item_tier_1")
+    local tierOneDeck = findOneByName("item_tier_1")
+    tierOneDeck.randomize()
     offsetX = -6;
     for i=1,8,1 do
-        zeroTierDeck.takeObject({
+        tierOneDeck.takeObject({
             position = {offsetX, 5, 3},
             smooth = true,
             flip = true
@@ -186,9 +187,9 @@ function syncScenario()
                     local master = findOneByName(model['model'])
                     local clone = master.clone({
                         position = {
-                            topLeftPos['x'] + (pitchX * model['x']),
+                            topLeftPos['x'] + (pitchX * (model['x'] - 1)),
                             topLeftPos['y'] + 3,
-                            topLeftPos['z'] + (pitchY * model['y'])
+                            topLeftPos['z'] + (pitchY * (model['y'] - 1))
                         }
                     })
                     clone.setColorTint(model['color'])

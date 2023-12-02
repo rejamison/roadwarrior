@@ -909,15 +909,15 @@ class RoadWarriorScenarioCard extends Cardistry.Card {
 
         this.factionText = faction;
         this.nameText = name;
-        this.playerPosY = playerPos.split(',')[0] - 1 - 3;
-        this.playerPosX = 10 - playerPos.split(',')[1] - 1;
+        this.playerPosY = playerPos.split(',')[1] - 1;
+        this.playerPosX = playerPos.split(',')[0] - 1;
         this.enemies = enemies.trim().split('\n').map((value) => {
             const re = /([a-zA-Z_]+)\(([0-9]+),([0-9]+)\)/;
             const result = re.exec(value);
             let enemy = {
                 tag: result[1],
-                y: result[2] - 1 - 3,
-                x: 10 - result[3] - 1
+                y: result[3] - 1,
+                x: result[2] - 1
             };
 
             if(vehicles[enemy.tag]) {
@@ -1328,8 +1328,8 @@ async function main() {
                     const result = re.exec(loc);
                     let enemy = {
                         tag: result[1],
-                        y: result[2] - 1 - 3,
-                        x: 10 - result[3] - 1
+                        y: parseInt(result[3]),
+                        x: parseInt(result[2])
                     };
                     let vehicle = stats.vehicles[enemy.tag];
                     let color = COLORS[vehicle.Color];
@@ -1355,7 +1355,7 @@ async function main() {
                                     // do nothing
                                 } else {
                                     if(size == 2) {
-                                        val.y += 0.5;
+                                        val.x += 0.5;
                                     } else if(size == 4) {
                                         val.x += 0.5;
                                         val.y += 0.5;
@@ -1376,8 +1376,8 @@ async function main() {
                 scenario['AI Tags'] = [...Object.keys(uniqueAiTags)];
                 let playerPos = scenario['Player Pos'].split(',');
                 scenario['Player Pos'] = {
-                    y: parseInt(playerPos[0]) - 3,
-                    x: 10 - parseInt(playerPos[1])
+                    y: parseInt(playerPos[1]),
+                    x: parseInt(playerPos[0])
                 };
             });
         });
