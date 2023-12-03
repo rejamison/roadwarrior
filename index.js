@@ -51,13 +51,15 @@ const FONT_TYPES = {
     'rokkitt_light': 'Rokkitt Light',
     'archivo': 'Archivo',
     'fredericka': 'Fredericka',
-    'alfaSlabOne': 'Alfa Slab One'
+    'alfaSlabOne': 'Alfa Slab One',
+    'video_bold': 'Video Bold'
 }
 const STYLES = {
     fullBack: new TextStyle(FONT_TYPES.alfaSlabOne, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'center', 'middle'),
     header: new TextStyle(FONT_TYPES.alfaSlabOne, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
     body: new TextStyle(FONT_TYPES.rokkitt, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
     bodyBold: new TextStyle(FONT_TYPES.rokkitt_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI, COLORS.black, 'left', 'top'),
+    backFactionName: new TextStyle(FONT_TYPES.video_bold, DEFAULT_TEXT_SIZE * DEFAULT_DPI * 3, COLORS.white, 'left', 'middle'),
 }
 
 // setup the randomizer
@@ -71,6 +73,7 @@ cvs.registerFont('lib/rokkitt/static/Rokkitt-Light.ttf', {family: FONT_TYPES.rok
 cvs.registerFont('lib/Archivo_Black/ArchivoBlack-Regular.ttf', {family: FONT_TYPES.archivo});
 cvs.registerFont('lib/Fredericka_the_Great/FrederickatheGreat-Regular.ttf', {family: FONT_TYPES.fredericka});
 cvs.registerFont('lib/Alfa_Slab_One/AlfaSlabOne-Regular.ttf', {family: FONT_TYPES.alfaSlabOne});
+cvs.registerFont('lib/Video_Bold.otf', {family: FONT_TYPES.video_bold});
 
 // load images
 const im = new ImageManager();
@@ -471,6 +474,33 @@ class RoadWarriorItemCardBack extends Cardistry.Card {
             this.bgColor,
             this.image,
             true
+        ));
+    }
+}
+
+class RoadWarriorScenarioCardBack extends Cardistry.Card {
+    image
+    factionName
+
+    constructor(image, factionName) {
+        super(CARD_HEIGHT * 2, CARD_WIDTH * 2, CARD_BLEED, CARD_SAFE, CARD_EXTRA, COLORS.white, DEFAULT_DPI);
+
+        this.image = image;
+        this.factionName = factionName;
+
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getFullBoundRect(),
+            this.bgColor,
+            this.image,
+            true
+        ));
+        this.addElement(new Cardistry.TextBox(
+            this,
+            this.factionName,
+            STYLES.backFactionName,
+            0,
+            this.getDrawableBoundRect().cutTopPct(0.2)
         ));
     }
 }
@@ -1065,11 +1095,15 @@ async function loadSheet() {
         }
 
         // load all the backs
-        im.loadImage('item_starter_back', 'assets/back_item_starter.png')
-        im.loadImage('item_tier_1_back', 'assets/back_item_tier_1.png')
-        im.loadImage('item_tier_2_back', 'assets/back_item_tier_2.png')
-        im.loadImage('item_tier_3_back', 'assets/back_item_tier_3.png')
-        im.loadImage('item_tier_4_back', 'assets/back_item_tier_4.png')
+        im.loadImage('item_starter_back', 'assets/back_item_starter.png');
+        im.loadImage('item_tier_1_back', 'assets/back_item_tier_1.png');
+        im.loadImage('item_tier_2_back', 'assets/back_item_tier_2.png');
+        im.loadImage('item_tier_3_back', 'assets/back_item_tier_3.png');
+        im.loadImage('item_tier_4_back', 'assets/back_item_tier_4.png');
+        im.loadImage('scenario_tier_1_back', 'assets/back_scenario_1.png');
+        im.loadImage('scenario_tier_2_back', 'assets/back_scenario_2.png');
+        im.loadImage('scenario_tier_3_back', 'assets/back_scenario_3.png');
+        im.loadImage('scenario_tier_4_back', 'assets/back_scenario_4.png');
 
         // load all the dice
         const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
@@ -1259,12 +1293,9 @@ async function main() {
                 card.draw();
                 scenario_cards.push(card);
 
-                let scenario_back = new RoadWarriorCardBack(
-                    deckName + ' Scenario\n' + scenario['Faction'],
-                    null,
-                    COLORS.dark_gray,
-                    COLORS.white,
-                    true
+                let scenario_back = new RoadWarriorScenarioCardBack(
+                    im.get('scenario_' + convertToFilename(deckName) + '_back'),
+                    scenario['Faction']
                 );
                 scenario_back.draw();
                 scenario_card_backs.push(scenario_back);

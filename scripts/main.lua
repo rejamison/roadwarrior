@@ -29,7 +29,7 @@ function resetDeck(tag)
     -- sweep all objects with the deck tag into the original decks
     for _, obj in ipairs(getObjects()) do
         if obj.hasTag(tag) then
-            if not obj.is_face_down then obj.flip() end
+            if not obj.is_face_down and tag ~= 'rule' then obj.flip() end
             obj.setPosition(originalPositions[tag])
         end
     end
@@ -38,7 +38,9 @@ function resetDeck(tag)
         for _, obj in ipairs(getObjects()) do
             if obj.hasTag(tag) and obj.type == 'Deck' then
                 obj.setName(tag)
-                obj.randomize()
+                if tag ~= 'initiative' and tag ~= 'rule' and tag ~= 'item_starter' then
+                    obj.randomize()
+                end
             end
         end
     end, 1)
@@ -149,7 +151,6 @@ function syncScenario()
                 -- setup initiative cards
                 local tags = scenario['Initiative Tags']
                 for _, tag in ipairs(tags) do
-                    print(tag)
                     takeObjectByName(initiativeDeck, tag, {
                         position = initiativeZone.getPosition(),
                         smooth = true
