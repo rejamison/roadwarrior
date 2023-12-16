@@ -505,6 +505,25 @@ class RoadWarriorScenarioCardBack extends Cardistry.Card {
     }
 }
 
+class RoadWarriorInitiativeCardBack extends Cardistry.Card {
+    image
+    factionName
+
+    constructor(image) {
+        super(CARD_HEIGHT, CARD_WIDTH, CARD_BLEED, CARD_SAFE, CARD_EXTRA, COLORS.white, DEFAULT_DPI);
+
+        this.image = image;
+
+        this.addElement(new Cardistry.ImageBox(
+            this,
+            this.getFullBoundRect(),
+            this.bgColor,
+            this.image,
+            true
+        ));
+    }
+}
+
 class RoadWarriorAICardBack extends Cardistry.Card {
     factionName
     unitLogo
@@ -859,14 +878,14 @@ class RoadWarriorInitiativeCard extends Cardistry.Card {
         if(this.color) {
             this.addElement(new Cardistry.Box(
                 this,
-                this.getFullBoundRect().cutPct(0, 0, 0.55, 0),
+                this.getFullBoundRect().cutPct(0, 0, 0.45, 0),
                 COLORS[this.color]
             ));
         }
         this.addElement(new Cardistry.TextBox(
             this,
             this.name,
-            STYLES.bodyBold.scale(1.1).realign('right', 'bottom').recolor(COLORS.white),
+            STYLES.bodyBold.scale(1).realign('right', 'bottom').recolor(COLORS.white),
             0,
             this.getDrawableBoundRect().cutPct(0.5, 0, 0.66 + 0.05, 0),
             COLORS[this.color]));
@@ -1104,6 +1123,7 @@ async function loadSheet() {
         im.loadImage('scenario_tier_2_back', 'assets/back_scenario_2.png');
         im.loadImage('scenario_tier_3_back', 'assets/back_scenario_3.png');
         im.loadImage('scenario_tier_4_back', 'assets/back_scenario_4.png');
+        im.loadImage('initiative_back', 'assets/back_initiative.png')
 
         // load all the dice
         const dice_response = await getSheetValues(SHEET_ID, 'Dice', auth);
@@ -1228,7 +1248,7 @@ async function main() {
         let init_sheet = new Cardistry.Sheet(init_cards);
         exportScaledAndUpload(init_sheet, 'var/tts/initiative_fronts.png', 5, 1, true, false);
         init_sheet.exportScaledPNG('var/pnp/initiative_fronts.png', 5, 1, true, true);
-        let init_back = new RoadWarriorCardBack('INITIATIVE', null, COLORS.red, COLORS.white, true);
+        let init_back = new RoadWarriorInitiativeCardBack(im.get('initiative_back'));
         init_back.draw();
         exportAndUpload(init_back, 'var/tts/initiative_back.png');
 
